@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\CategoriasController;
+use App\Http\Controllers\ProyectoController;
+use App\Http\Controllers\TareasController;
+use App\Models\Proyecto;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +18,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('welcome');//Aqui puedo agregar el iniciar_session para ver el login 
 });
+//Proyecto
+Route::get('/ver-proyecto',[ProyectoController::class, 'verProyecto'])->name('proyecto');
+Route::post('/proyectos', [ProyectoController::class, 'CrearProyecto']);
+//Tareas
+Route::get('/ver-tareas', [TareasController::class, 'verTareas'])->name('tareas');
+
+Route::get('/ver-categoria', [CategoriasController::class, 'verCategorias'])->name('categorias');
