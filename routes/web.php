@@ -22,8 +22,15 @@ Route::get('/', function () {
 });
 //Proyecto
 Route::get('/ver-proyecto',[ProyectoController::class, 'verProyecto'])->name('proyecto');
-Route::post('/proyectos', [ProyectoController::class, 'CrearProyecto']);
+Route::post('/proyectos', [ProyectoController::class, 'registrarProyecto']);
 //Tareas
 Route::get('/ver-tareas', [TareasController::class, 'verTareas'])->name('tareas');
 
 Route::get('/ver-categoria', [CategoriasController::class, 'verCategorias'])->name('categorias');
+Route::get('/listar-categorias', [CategoriasController::class, 'listaCategorias']);
+Route::post('/registrar/categoria', [CategoriasController::class, 'registrarCategoria']);
+
+Route::get('/categoria/select-categoria', [ProyectoController::class, 'traerCategoria']);
+Route::get('/usuarios/select-usuarios', [ProyectoController::class, 'traerUsuario']);
+
+

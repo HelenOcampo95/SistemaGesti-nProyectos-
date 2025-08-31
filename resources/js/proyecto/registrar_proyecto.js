@@ -1,64 +1,129 @@
-import {createApp} from "vue/dist/vue.esm-bundler";
+import { createApp } from "vue/dist/vue.esm-bundler";
+import { activarLoadBtn, desactivarLoadBtn } from "@/store/ayudas/Load";
+import Swal from "sweetalert2"; // 👈 Importamos SweetAlert2
 
-const appProyecto = createApp({
+const appProyectos = createApp({
     data() {
         return {
-            form: {
-                nombre_proyecto: '',
-                descripcion_proyecto: '',
-                fecha_inicio: '',
-                fecha_entrega: '',
-                estado_proyecto: ''
-            }
+            tabla: null,
         }
     },
-    methods: {
-
-        registrarProyecto(){
-
-            activarLoadBtn('btn_registrar_proyecto');
-
-            axios.post('/proyectos', {
-                    nombre: nombreProyecto
-                })
-                .then( res => {
-                    toastr.success(`El cliente ${nombreProyecto} ha sido creado correctamente`);
-                    $('#nombre_proyecto').val('');
-                    $('#modal_registrar_proyecto').modal('hide');
-
-                    this.tablaListadoDeClientes.draw();
-
-                })
-                .catch( error => {
-
-                    const er = error.response;
-
-                    if ( er.hasOwnProperty('data') ) {
-
-                        if (er.data.hasOwnProperty('cliente_existe')) {
-                            swal({
-                                title: 'El cliente ya existe',
-                                text: 'El cliente que ingresaste ya se encuentra registrado',
-                                icon: 'error'
-                            });
-
-                            return;
-                        }
-
+    mounted(){
+        //select para obtener el nombre del usuario.
+        $('#id_usuario').select2({
+            dropdownParent: $('#modal_registrar_proyecto'),
+            ajax: {
+                url: '/usuarios/select-usuarios',
+                dataType: 'json',
+                type: 'get',
+                delay: 300,
+                language: 'es',
+                data: params => {
+                    return {
+                        busqueda: params.term,
+                        page: params.page
                     }
+                },
+                processResults: data => {
 
-                    swal({
-                        title: '¡Ups!',
-                        text: 'Por favor ingresa el nombre del nuevo cliente',
-                        icon: 'error'
+                    let results = [];
+
+                    $.each(data, function(index, item) {
+                        results.push({
+                            id: item.id_usuario,
+                            text: `${item.nombre_usuario}`
+                        })
+                    })
+
+                    return { results }
+                },
+                cache: true
+            },
+
+        });
+
+        //Select para obtener la categoria del proyecto
+        $('#id_categoria').select2({
+            dropdownParent: $('#modal_registrar_proyecto'),
+            ajax: {
+                url: '/categoria/select-categoria',
+                dataType: 'json',
+                type: 'get',
+                delay: 300,
+                language: 'es',
+                data: params => {
+                    return {
+                        busqueda: params.term,
+                        page: params.page
+                    }
+                },
+                processResults: data => {
+
+                    let results = [];
+
+                    $.each(data, function(index, item) {
+                        results.push({
+                            id: item.id_categoria,
+                            text: `${item.nombre_categoria}`
+                        })
+                    })
+
+                    return { results }
+                },
+                cache: true
+            },
+
+        });
+    },
+    methods: {
+        crearProyecto() {
+            activarLoadBtn('btn_crear_proyecto');
+
+            // Serializamos el formulario
+            let form = $('#formulario_registrar_proyecto').serialize();
+                console.log("Datos enviados:", form);
+
+            axios.post('/proyectos', form)
+                .then(() => {
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        text: 'El proyecto fue creado correctamente',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
                     });
 
+                    $('#modal_registrar_proyecto').modal('hide');
+                    $('#formulario_registrar_proyecto')[0].reset();
                 })
-                .finally( () => {
-                    desactivarLoadBtn('btn_crear_nuevo_cliente');
+                .catch(error => {
+                    if (error.response) {
+                        console.log("Respuesta completa del servidor:", error.response);
+                    } else {
+                        console.log("Error sin response:", error);
+                    }
+
+                    if (error.response && error.response.status === 422) {
+                        Swal.fire({
+                            title: 'Hace falta información',
+                            text: 'Por favor completa todos los campos requeridos',
+                            icon: 'error',
+                            confirmButtonText: 'Entendido'
+                        });
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: '¡Vaya!',
+                        text: 'Ocurrió un error, contacta soporte',
+                        icon: 'error',
+                        confirmButtonText: 'Cerrar'
+                    });
                 })
+                .finally(() => {
+                    desactivarLoadBtn('btn_crear_proyecto');
+                });
         }
     }
-})
+});
 
-appProyecto.mount('#kt_app_main')
+appProyectos.mount('#app_general');

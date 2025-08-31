@@ -2,7 +2,7 @@
 
 @section('contenido')
 
-<div class="app-main flex-column flex-row-fluid" id="app_general">
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
 						<!--begin::Content wrapper-->
 						<div class="d-flex flex-column flex-column-fluid">
 							<!--begin::Toolbar-->
@@ -147,7 +147,7 @@
 										<div class="scroll-y me-n7 pe-7" id="kt_modal_add_customer_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_customer_header" data-kt-scroll-wrappers="#kt_modal_add_customer_scroll" data-kt-scroll-offset="300px">
 											<div class="mb-5 fv-row mb-7">
 												<label class="fs-6 fw-semibold mb-2 required">Nombre del proyecto</label>
-												<input type="text" class="form-control form-control-solid" placeholder="" name="text" id="nombre_proyecto"/>
+												<input type="text" class="form-control form-control-solid" placeholder="" name="nombre_proyecto" id="nombre_proyecto"/>
 											</div>
 											<div class="mb-5 fv-row">
 												<label for="" class="form-label">Descripción del proyecto</label>
@@ -155,7 +155,7 @@
 											</div>
 											<div class="mb-5 fv-row">
 												<label class="fs-6 fw-semibold mb-2 required" >Fecha inicio</label>
-                                                <input type="date" class="form-control form-control-solid" id="fecha_inicio" placeholder="" name="fecha_incio" value="" />
+                                                <input type="date" class="form-control form-control-solid" id="fecha_inicio" placeholder="" name="fecha_inicio" value="" />
 											</div>
 											<div class="mb-5 fv-row">
 												<label class="fs-6 fw-semibold mb-2 required" >Fecha entrega</label>
@@ -163,13 +163,21 @@
 											</div>
 											<div class="mb-5 fv-row mb-7">
 												<label class="fs-6 fw-semibold mb-2 required">Estado</label>
-												<input type="text" class="form-control form-control-solid" placeholder="" name="text" id="estado"/>
+												<input type="text" class="form-control form-control-solid" placeholder="" name="estado_proyecto" id="estado_proyecto"/>
+											</div>
+											<div class="mb-5 fv-row mb-7">
+												<label class="fs-6 fw-semibold mb-2 required">Categoria</label>
+												<select  class="form-select form-select-solid" data-placeholder="Seleccione una categoria" name="id_categoria" id="id_categoria"></select>
+											</div>
+											<div class="mb-5 fv-row mb-7">
+												<label class="fs-6 fw-semibold mb-2 required">usuario</label>
+												<select name="id_usuario" class="form-select form-select-solid" data-placeholder="Seleccione un usuario" id="id_usuario"></select>
 											</div>
 
 										</div>
 									</div>
 									<div class="modal-footer flex-center">
-										<button type="button" id="btn_registrar_proyecto" class="btn btn-primary" @click.prevent="registrarProyecto">
+										<button type="button" id="btn_crear_proyecto" class="btn btn-success" @click.prevent="crearProyecto">
 											<span class="indicator-label">Registrar proyecto</span>
 											<span class="indicator-progress">Por favor espere...
 											<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>

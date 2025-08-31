@@ -15,7 +15,8 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css', 'resources/js/app.js',
-                'resources/js/proyecto/registrar_proyecto.js'
+                'resources/js/proyecto/registrar_proyecto.js',
+                'resources/js/categorias/registrar_categoria.js'
 
             ],
             refresh: true,

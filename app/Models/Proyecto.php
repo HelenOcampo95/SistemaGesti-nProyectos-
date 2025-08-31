@@ -11,8 +11,8 @@ class Proyecto extends Model
     use HasFactory;
 
     protected $keyType = 'string';
-    public $incrementing = false;
-    protected $table = 'sgp';
+    public $incrementing = true;
+    protected $table = 'sgp.proyecto';
 
     const CREATED_AT = 'creado_en';
     const UPDATED_AT = 'actualizado_en';
