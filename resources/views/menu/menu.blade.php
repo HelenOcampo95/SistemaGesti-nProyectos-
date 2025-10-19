@@ -224,7 +224,7 @@
                     <!--end::Content wrapper-->
 
                     <!--begin::Footer-->
-                    <div id="kt_app_footer" class="app-footer">
+                    <div id="kt_app_footer" class="app-footer p-0 m-0">
                         <!--begin::Footer container-->
                         <div class="app-container container-fluid d-flex flex-column flex-md-row flex-center flex-md-stack py-3">
                             <!--begin::Copyright-->

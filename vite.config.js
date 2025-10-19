@@ -16,7 +16,11 @@ export default defineConfig({
             input: [
                 'resources/css/app.css', 'resources/js/app.js',
                 'resources/js/proyecto/registrar_proyecto.js',
-                'resources/js/categorias/registrar_categoria.js'
+                'resources/js/proyecto/editar_proyecto.js',
+                'resources/js/categorias/registrar_categoria.js',
+                'resources/js/tareas/asignar_tareas.js',
+                'resources/js/autenticacion/registro.js',
+                'resources/js/inicio_sesion/inicio_sesion.js',
 
             ],
             refresh: true,

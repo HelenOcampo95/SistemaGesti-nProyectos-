@@ -12,7 +12,7 @@
 									<!--begin::Page title-->
 									<div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
 										<!--begin::Title-->
-										<h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">Proyecto</h1>
+										<h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">Proyectos</h1>
 										<!--end::Title-->
 										<!--begin::Breadcrumb-->
 										<ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
@@ -39,83 +39,22 @@
 							<div id="kt_app_content" class="app-content flex-column-fluid">
 								<!--begin::Content container-->
 								<div id="kt_app_content_container" class="app-container container-xxl">
-									<!--begin::Navbar-->
-									<div class="card mb-5 mb-xl-10">
-										<div class="card-body pt-9 pb-0">
-											<!--begin::Details-->
-											<div class="d-flex flex-wrap flex-sm-nowrap mb-3">
-												<!--begin::Info-->
-												<div class="flex-grow-1">
-													<!--begin::Title-->
-													<div class="d-flex justify-content-between align-items-start flex-wrap mb-2">
-														<!--begin::User-->
-														<div class="d-flex flex-column mb-10">
-															<!--begin::Name-->
-															<div class="d-flex align-items-center mb-2">
-																<a href="#" class="text-gray-900 text-hover-primary fs-4 fw-bold me-1">Sistema de gestión de proyectos. </a>
-															</div>
-															<!--end::Name-->
-														</div>
-													</div>
-													<!--end::Title-->
-													<!--begin::Stats-->
-													<div class="d-flex flex-wrap flex-stack">
-														<!--begin::Wrapper-->
-														<div class="d-flex flex-column flex-grow-1 pe-8">
-															<!--begin::Stats-->
-															<div class="d-flex flex-wrap">
-																<!--begin::Stat-->
-																<div class="min-w-125px py-3 px-4 me-6 mb-3">
-																	<!--begin::Number-->
-																	<div class="d-flex align-items-center">
-																		<div class="fw-bold fs-6 text-black-600">Fecha de inicio</div>
-																	</div>
-																	<!--end::Number-->
-																	<!--begin::Label-->
-																	
-                                                                    <span class="badge badge-light-success fs-7 fw-bold">17 de abril de 2025</span>
-																	<!--end::Label-->
-																</div>
-																<!--end::Stat-->
-																<!--begin::Stat-->
-																<div class="min-w-125px py-3 px-4 me-6 mb-3">
-																	<!--begin::Number-->
-																	<div class="d-flex align-items-center">
-																		<div class="fw-bold fs-6 text-black-600">Fecha de entrega</div>
-																	</div>
-																	<!--end::Number-->
-																	<!--begin::Label-->
-																	<span class="badge badge-light-danger fs-7 fw-bold">17 de noviembre de 2025</span>
-																	<!--end::Label-->
-																</div>
-															</div>
-															<!--end::Stats-->
-														</div>
-														<!--end::Wrapper-->
-														<!--begin::Progress-->
-														<div class="d-flex align-items-center w-200px w-sm-300px flex-column mt-3">
-															<div class="d-flex justify-content-between w-100 mt-auto mb-2">
-																<span class="fw-semibold fs-6 text-gray-400">Progreso</span>
-																<span class="fw-bold fs-6">50%</span>
-															</div>
-															<div class="h-5px mx-3 w-100 bg-light mb-3">
-																<div class="bg-success rounded h-5px" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-															</div>
-														</div>
-														<!--end::Progress-->
-													</div>
-													<!--end::Stats-->
+									<div class="row g-5 g-xl-8">
+										@foreach ($proyectos as $proyecto)
+										<div class="col-xl-4">
+											<!--begin::Statistics Widget 1-->
+											<div class="card bgi-no-repeat card-xl-stretch mb-xl-8" style="background-position: right top; background-size: 30% auto; background-color: #FFFFFF;">
+												<!--begin::Body-->
+												<div class="card-body">
+													<a href="{{ 'detalle/'.$proyecto->id_proyecto }}" class="text-gray-800 fw-bold link-primary">{{ $proyecto->nombre_proyecto }}</a>
+													<div class="text-gray-600 my-6">{{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->translatedFormat('d-F-Y') }}</div>
+													<p class="text-gray-600 fs-5 m-0"  style="text-align: justify;">{{ $proyecto->descripcion_proyecto }}</p>
 												</div>
-												<!--end::Info-->
+												<!--end::Body-->
 											</div>
+											<!--end::Statistics Widget 1-->
 										</div>
-                                        <div class="card-body pb-0">
-													<span class="fs-5 fw-semibold text-gray-600 pb-5 d-block">Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor
-                                                        (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen.
-                                                        No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado 
-                                                        en los 60s con la creación de las hojas "Letraset", las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo 
-                                                        Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.</span>
-												</div>
+										@endforeach
 									</div>
 								</div>
 								<!--end::Content container-->
@@ -153,13 +92,15 @@
 												<label for="" class="form-label">Descripción del proyecto</label>
 												<textarea class="form-control form-control-solid form-control-sm" placeholder="" name="descripcion_proyecto" id="descripcion_proyecto" rows="4"></textarea>
 											</div>
-											<div class="mb-5 fv-row">
-												<label class="fs-6 fw-semibold mb-2 required" >Fecha inicio</label>
-                                                <input type="date" class="form-control form-control-solid" id="fecha_inicio" placeholder="" name="fecha_inicio" value="" />
-											</div>
-											<div class="mb-5 fv-row">
-												<label class="fs-6 fw-semibold mb-2 required" >Fecha entrega</label>
-                                                <input type="date" class="form-control form-control-solid" id="fecha_entrega" placeholder="" name="fecha_entrega" value="" />
+											<div class="row mt-5 mb-4">
+												<div class="col-12 col-md-6">
+													<label class="fs-6 fw-semibold mb-2 required" >Fecha inicio</label>
+													<input type="text" class="form-control form-control-solid" id="fecha_inicio" placeholder="" name="fecha_inicio" value="" />
+												</div>
+												<div class="col-12 col-md-6">
+													<label class="fs-6 fw-semibold mb-2 required" >Fecha entrega</label>
+													<input type="text" class="form-control form-control-solid" id="fecha_entrega" placeholder="" name="fecha_entrega" value="" />
+												</div>
 											</div>
 											<div class="mb-5 fv-row mb-7">
 												<label class="fs-6 fw-semibold mb-2 required">Estado</label>
@@ -173,7 +114,16 @@
 												<label class="fs-6 fw-semibold mb-2 required">usuario</label>
 												<select name="id_usuario" class="form-select form-select-solid" data-placeholder="Seleccione un usuario" id="id_usuario"></select>
 											</div>
+											<div class="mb-3">
+												<label class="form-label">Agregar colaboradores (por correo)</label>
+												<div id="chipsContainer" class="border p-2 rounded" style="min-height: 40px; display: flex; flex-wrap: wrap; align-items: center;">
+													<input type="text" id="correo_usuario" name="correo_usuario" placeholder="Escribe un correo y presiona Enter" style="border: none; outline: none; flex: 1;">
+												</div>
+												<small class="text-muted">Presiona Enter para agregar varios correos</small>
+											</div>	
 
+											<!-- Input hidden que enviará los correos al backend -->
+											<input type="hidden" name="correo_usuario" id="correo_usuarios_hidden">
 										</div>
 									</div>
 									<div class="modal-footer flex-center">

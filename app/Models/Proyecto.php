@@ -11,6 +11,7 @@ class Proyecto extends Model
     use HasFactory;
 
     protected $keyType = 'string';
+    protected $primaryKey = 'id_proyecto';
     public $incrementing = true;
     protected $table = 'sgp.proyecto';
 
@@ -18,6 +19,7 @@ class Proyecto extends Model
     const UPDATED_AT = 'actualizado_en';
 
     protected $fillable = [
+        'id_proyecto',
         'nombre_proyecto',
         'descripcion_proyecto',
         'fecha_inicio',
@@ -26,5 +28,15 @@ class Proyecto extends Model
         'id_usuario',
         'id_categoria',
     ];
+
+    public function categoria()
+    {
+        return $this->belongsTo(Categorias::class, 'id_categoria', 'id_categoria');
+    }
+
+    public function usuario()
+    {
+        return $this->belongsTo(Usuarios::class, 'id_usuario', 'id_usuario');
+    }
 
 }
