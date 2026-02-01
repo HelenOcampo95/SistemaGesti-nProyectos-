@@ -1,54 +1,41 @@
-import { createApp } from 'vue'
-import axios from 'axios'
-axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').content;
+import { createApp } from 'vue';
+import axios from "axios";
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.css';
 
-createApp({
-    data() {
-        return {
-            nombre_usuario: '',
-            apellido_usuario: '',
-            cedula: '',
-            correo_usuario: '',
-            contrasena_usuario: '',
-            cargando: false
-        }
-    },
-    mounted() {
-        
-    },
+const app = createApp({
     methods: {
+        async enviarFormularioRegistro() {
+        const form = document.getElementById('form_registro');
+        const formData = new FormData(form);
 
-async enviarFormularioRegistro() {
-    
-    const formulario = document.getElementById('form_registro'); 
-    const datos = new FormData(formulario);
-            
-    try {
-        const response = await axios.post('/registrarme', datos); 
-
-        Swal.fire({
-            icon: 'success',
-            title: '¡Registro Exitoso!',
-            text: response.data.mensaje || 'Tu cuenta ha sido creada.',
-            confirmButtonText: 'Continuar'
-        }).then(() => {
-            formulario.reset(); 
-        });
-
-
-    } catch (error) {
-        // ...
-        if (error.response && error.response.status === 422) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Verifique los datos',
-                text: 'Hay campos que necesitan ser corregidos.',
-                confirmButtonText: 'Entendido'
+        try {
+            const { data } = await axios.post('/registrarme', formData, {
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            }
             });
-        } else {
-            // ...
+
+            await Swal.fire({
+            icon: 'success',
+            title: '¡Listo!',
+            text: data?.message ?? 'El usuario se ha creado correctamente',
+            });
+
+            // Redirige a inicio (o dashboard)
+            window.location.href = '/';
+        } catch (error) {
+            if (error.response?.status === 422) {
+            // Errores de validación del back
+            const errores = error.response.data.errors || {};
+            const lista = Object.values(errores).flat().join('\n');
+            Swal.fire({ icon: 'error', title: 'Revisa los datos', text: lista || 'Datos inválidos' });
+            return;
+            }
+            Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo registrar el usuario.' });
+        }
         }
     }
-}
-    }
-}).mount('#app_registro');
+    });
+
+app.mount('#app_registro');

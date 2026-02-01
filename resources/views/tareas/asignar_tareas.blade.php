@@ -61,6 +61,7 @@
 											<thead>
 												<tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
 													<th>Proyecto</th>
+													<th>Título</th>
 													<th>Descripción</th>
 													<th>Fecha entrega</th>
 													<th>Estado</th>
@@ -105,6 +106,10 @@
                                 <label class="fs-6 fw-semibold mb-2 required">Nombre del proyecto</label>
 								<select  class="form-select form-select-solid" data-placeholder="Seleccione un proyecto" name="id_proyecto" id="id_proyecto"></select>
                             </div>
+							<div class="mb-5 fv-row">
+								<label for="" class="form-label">Título de la tarea</label>
+								<input class="form-control form-control-solid form-control-sm" placeholder="" name="titulo_tarea" id="titulo_tarea" rows="4"></input>
+							</div>
 							<div class="mb-5 fv-row">
 								<label for="" class="form-label">Descripción de la tarea</label>
 								<textarea class="form-control form-control-solid form-control-sm" placeholder="" name="descripcion_tarea" id="descripcion_tarea" rows="4"></textarea>
@@ -153,6 +158,12 @@
                     </div>
                 </div>
                 <div class="modal-body py-10 px-lg-17">
+					<div class="mb-5 fv-row">
+                        <label class="form-label">Título de la tarea</label>
+                        <input class="form-control form-control-solid form-control-sm"
+                                name="titulo_tarea_editar"
+                                id="titulo_tarea_editar" rows="4"></input>
+                    </div>
                     <div class="mb-5 fv-row">
                         <label class="form-label">Descripción de la tarea</label>
                         <textarea class="form-control form-control-solid form-control-sm"

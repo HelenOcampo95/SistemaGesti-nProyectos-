@@ -3,8 +3,9 @@
 <head>
     <title>Areandina</title>
     <meta charset="utf-8" />
-    <meta name="description" content="Iniciar sesión en Ecoline Agrícola" />
+    <meta name="description" content="Iniciar sesión en Areandina" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta property="og:locale" content="es_ES" />
 
     <link rel="apple-touch-icon" sizes="57x57" href="{{ asset('images/iconos/apple-icon-57x57.png') }}">
@@ -89,6 +90,43 @@
                         <!-- ./Botón menú Tablets y Mobile -->
                     </div>
                 </div>
+                <div class="d-flex align-items-stretch justify-content-end flex-lg-grow-1" id="kt_app_header_wrapper">
+                    <div class="app-navbar flex-shrink-0">
+                        <div class="app-navbar-item ms-1 ms-lg-3">
+                        </div>
+                        <div class="app-navbar-item ms-1 ms-lg-3" id="kt_header_user_menu_toggle">
+                            <!--begin::Menu wrapper-->
+                            <div class="cursor-pointer symbol symbol-75px symbol-md-75px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
+                                <div class="menu-content d-flex align-items-center px-3">
+                                        <div class="d-flex flex-column me-5">
+                                            <div class="fw-bold d-flex align-items-center fs-5">{{ auth()->user()->nombre_usuario }} {{ auth()->user()->apellido_usuario }} 
+                                            </div>
+                                        </div>
+                                        <div class="symbol symbol-40px symbol-circle me-5">
+                                            <img alt="Logo" src="{{ asset('assets/media/avatars/blank.png') }}" />
+                                        </div>
+                                        <!--end::Username-->
+                                </div>
+                            </div>
+                            <!--begin::User account menu-->
+                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-color fw-semibold py-4 fs-6 w-275px" data-kt-menu="true">
+                                <!--begin::Menu separator-->
+                                <div class="separator my-2 d-none"></div>
+                                <div class="separator my-2"></div>
+                                <div class="menu-item px-5">
+                                    <form action="/logout" method="POST">
+                                        @csrf
+                                        <a href="#" class="menu-link px-5" onclick="this.closest('form').submit()"><i class="fa-solid fa-right-from-bracket me-3"></i> Cerrar sesión</a>
+                                    </form>
+                                </div>
+                            </div>
+                            <!--end::User account menu-->
+                            <!--end::Menu wrapper-->
+                        </div>
+                        <!--end::User menu-->
+                    </div>
+                    <!--end::Navbar-->
+                </div>
             </div>
             <!--end::Header container-->
         </div>
@@ -101,11 +139,10 @@
                 <!--begin::Logo-->
 				<div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
                     <!--begin::Logo image-->
-                    {{-- <a href="">
+                    <a href="">
                         <img alt="Logo Areandina" src="{{ asset('assets/images/logo/Areandina.png') }}" class="h-70px app-sidebar-logo-default" />
                         <img alt="Logo Areandina" src="{{ asset('assets/images/logo/Areandina.png') }}" class="h-20px app-sidebar-logo-minimize" />
-                    </a> --}}
-                    <!--end::Logo image-->
+                    </a> 
 
                     <div id="kt_app_sidebar_toggle" class="app-sidebar-toggle btn btn-icon btn-shadow btn-sm btn-color-muted btn-active-color-primary body-bg h-30px w-30px position-absolute top-50 start-100 translate-middle rotate" data-kt-toggle="true" data-kt-toggle-state="active" data-kt-toggle-target="body" data-kt-toggle-name="app-sidebar-minimize">
                         <!--begin::Svg Icon | path: icons/duotune/arrows/arr079.svg-->
@@ -124,47 +161,65 @@
                         <!--begin::Menu-->
                         <div class="menu menu-column menu-rounded menu-sub-indention px-3" id="kt_app_sidebar_menu" data-kt-menu="true" data-kt-menu-expand="false">
                             <div class="menu-item">
-                                <a class="menu-link @if( request()->path() === 'dashboard' ) active @endif" href="/">
-                                                    <span class="menu-icon">
-                                                        <i class="bi bi-graph-up-arrow fs-3"></i>
-                                                    </span>
+                                <a class="menu-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+                                    <span class="menu-icon">
+                                        <i class="bi bi-graph-up-arrow fs-3"></i>
+                                    </span>
                                     <span class="menu-title">Dashboard</span>
                                 </a>
                             </div>
-                            <div class="menu-item">
-                                    <a class="menu-link" href="{{ route('proyecto') }}">
-                                        <span class="menu-icon">
-                                            <i class="fa-solid fa-lightbulb"></i>
-                                        </span>
-                                        <span class="menu-title">Proyecto</span>
-                                    </a>
-                            </div>
-                                <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                                    <div class="menu-item">
-                                    <a class="menu-link" href="{{ route('categorias') }}">
-                                        <span class="menu-icon">
-                                            <i class="bi bi-people-fill fs-3"></i>
-                                        </span>
-                                        <span class="menu-title">Categorias</span>
-                                    </a>
+                                @role('Estudiante')
+                                <div class="menu-item">
+                                        <a class="menu-link" href="{{ route('proyecto') }}">
+                                            <span class="menu-icon">
+                                                <i class="fa-solid fa-lightbulb"></i>
+                                            </span>
+                                            <span class="menu-title">Proyecto</span>
+                                        </a>
+                                </div>
+                                @endrole
+                                @role(['Docente Lider', 'Docente Director'])
+                                <div class="menu-item">
+                                        <a class="menu-link" href="{{ route('listarProyectos') }}">
+                                            <span class="menu-icon">
+                                                <i class="fa-solid fa-lightbulb"></i>
+                                            </span>
+                                            <span class="menu-title">Proyecto</span>
+                                        </a>
+                                </div>
+                                @endrole
+                                @role('Docente Lider')
+                                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                                        <div class="menu-item">
+                                        <a class="menu-link" href="{{ route('categorias') }}">
+                                            <span class="menu-icon">
+                                                <i class="bi bi-people-fill fs-3"></i>
+                                            </span>
+                                            <span class="menu-title">Categorias</span>
+                                        </a>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="menu-item">
-                                    <a class="menu-link" href="{{ route('tareas') }}">
-                                        <span class="menu-icon">
-                                            <i class="fa-solid fa-list-check"></i>
-                                        </span>
-                                        <span class="menu-title">Tareas</span>
-                                    </a>
-                                </div>
-                                <div class="menu-item">
-                                    <a class="menu-link" href="{{ route('tareas') }}">
-                                        <span class="menu-icon">
-                                            <i class="bi bi-people-fill fs-3"></i>
-                                        </span>
-                                        <span class="menu-title">Registrarme</span>
-                                    </a>
-                                </div>
+                                @endrole
+                                @can('Registrar tareas')
+                                    <div class="menu-item">
+                                        <a class="menu-link" href="{{ route('tareas') }}">
+                                            <span class="menu-icon">
+                                                <i class="fa-solid fa-list-check"></i>
+                                            </span>
+                                            <span class="menu-title">Tareas</span>
+                                        </a>
+                                    </div>
+                                @endcan
+                                @can('Registrar usuarios')
+                                    <div class="menu-item">
+                                        <a class="menu-link" href="{{ route('tareas') }}">
+                                            <span class="menu-icon">
+                                                <i class="bi bi-people-fill fs-3"></i>
+                                            </span>
+                                            <span class="menu-title">Registrarme</span>
+                                        </a>
+                                    </div>  
+                                @endcan
                         </div>
                     </div>
                 </div>

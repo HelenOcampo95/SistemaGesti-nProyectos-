@@ -1,4 +1,4 @@
-import { createApp } from "vue/dist/vue.esm-bundler";
+import { createApp } from 'vue';
 import { activarLoadBtn, desactivarLoadBtn } from "@/store/ayudas/Load";
 import Swal from "sweetalert2"; // 👈 Importamos SweetAlert2
 

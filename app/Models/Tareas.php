@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Routing\PendingSingletonResourceRegistration;
 
 class Tareas extends Model
 {
@@ -14,6 +15,9 @@ class Tareas extends Model
     
     const CREATED_AT = 'creado_en';
     const UPDATED_AT = 'actualizado_en';
+    const EN_PROCESO = 'En proceso';
+    const FINALIZADA = 'Finalizada';
+    const PENDIENTE  = 'Pendiente';
 
 
     protected $fillable = [

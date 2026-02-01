@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta property="og:locale" content="es_ES" />
     <meta property="og:title" content="Areandina | Sumamos por Colombia" />
-    <meta property="og:url" content="@yield('url', 'https://ecolineagricola.com/app')" />
+    <meta property="og:url" content="@yield('url', '')" />
     <meta property="og:site_name" content="Areandina| Iniciar Sesión" />
     <link rel="shortcut icon" href="{{ asset('images/identidad/favicon.ico') }}" />
 
@@ -86,6 +86,7 @@
 
 </div>
 </div>
+@yield('scripts')
 
 
 </body>

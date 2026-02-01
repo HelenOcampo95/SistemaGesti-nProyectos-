@@ -39,4 +39,20 @@ class Proyecto extends Model
         return $this->belongsTo(Usuarios::class, 'id_usuario', 'id_usuario');
     }
 
+    public function tareas()
+    {
+        return $this->hasMany(Tareas::class, 'id_proyecto', 'id_proyecto');
+    }
+    public function director()
+    {
+        return $this->belongsTo(Usuarios::class, 'id_docente_director', 'id_usuario');
+    }
+    public function lider()
+    {
+        return $this->belongsTo(Usuarios::class, 'id_docente_lider', 'id_usuario');
+    }
+    public function participantes()
+    {
+        return $this->belongsToMany(Usuarios::class, 'participantes_proyecto', 'id_proyecto', 'id_usuario');
+    }
 }

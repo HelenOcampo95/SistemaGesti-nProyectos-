@@ -2,8 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\DashboardUpdated;
+use App\Events\ProyectoCreado;
+use App\Events\TareaActualizada;
+use App\Events\TareaCreada;
 use App\Models\Tareas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use PhpParser\Node\Expr\FuncCall;
+use Symfony\Contracts\EventDispatcher\Event;
 use Yajra\DataTables\Facades\DataTables;
 
 class TareasController extends Controller
@@ -22,6 +29,7 @@ class TareasController extends Controller
             $tarea->observaciones_docente   = $request->observaciones_docente;
             $tarea->porcentaje_avance       = $request->porcentaje_avance;
             $tarea->id_proyecto             = $request->id_proyecto;
+            $tarea->titulo_tarea            = $request->titulo_tarea;
             $tarea->save();   
             
             return response()->json('La tarea se ha asignado correctamente', 200);   
@@ -33,10 +41,13 @@ class TareasController extends Controller
 
     public function listarTareas(Request $request)
     {
-        $tareas = Tareas::with('proyecto');
+        $tareas = Tareas::with('proyecto')->whereHas('proyecto', function($query) {
+            $query->where('id_docente_lider', auth()->id()); 
+        });
 
         return DataTables::eloquent($tareas)
             ->addColumn('nombre_proyecto', fn($c) => $c->proyecto->nombre_proyecto ?? 'Sin proyecto')
+            ->addColumn('titulo_tarea', fn($c) => $c->titulo_tarea ?? 'Sin título')
             ->addColumn('descripcion_tarea', fn($c) => $c->descripcion_tarea ?? 'Sin descripción')
             ->addColumn('fecha_entrega', fn($c) => $c->fecha_entrega ?? 'Sin fechas')
             ->addColumn('estado_tarea', fn($c) => $c->estado_tarea ?? 'Sin estado')
@@ -57,11 +68,14 @@ class TareasController extends Controller
     public function actualizarTarea(Request $request, $id_tareas)
     {
         try{
-            $tarea                          = Tareas::findOrFail($id_tareas);
-            if (!$request->hasAny(['descripcion_tarea', 'observaciones_docente'])) {
+            $tarea  = Tareas::findOrFail($id_tareas);
+            if (!$request->hasAny(['titulo_tarea','descripcion_tarea', 'observaciones_docente'])) {
                 return response()->json([
                     'error' => 'Debe enviar al menos una descripción o una observación'
                 ], 422);
+            }
+            if ($request->filled('titulo_tarea')) {
+                $tarea->titulo_tarea = $request->titulo_tarea;
             }
             if ($request->filled('descripcion_tarea')) {
                 $tarea->descripcion_tarea = $request->descripcion_tarea;
@@ -102,6 +116,39 @@ class TareasController extends Controller
                 'error' => 'No se puede eliminar esta categoría porque tiene registros asociados'
             ], 409);
         } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error en el servidor: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function detalleTarea($id_tarea){
+
+        $tarea = Tareas::with('proyecto')->findOrFail($id_tarea);
+
+        return view('tareas.detalle_tarea')->with(['tarea' => $tarea]);
+    }
+
+    public function entregarTarea(Request $request, $id_tarea){
+
+    try{
+        $tarea              = Tareas::with('proyecto')->findOrFail($id_tarea);
+        $tarea->id_tarea    = $id_tarea;
+        $tarea->estado_tarea= TAREAS::EN_PROCESO;
+        $tarea->url_tarea   = $request->url_tarea;
+        $tarea->save();
+
+        $idDocente = $tarea->proyecto->id_docente_lider;
+
+
+        $DashboardController = new DashboardController();
+        $data = $DashboardController->obtenerDashboardData($idDocente);
+    
+        event(new DashboardUpdated($data));
+        
+        return response()->json(['mensaje' => 'Tarea entregada correctamente']);
+
+    } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Error en el servidor: ' . $e->getMessage()
             ], 500);

@@ -16,3 +16,13 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
+
+Broadcast::channel('dashboard.institucional', function ($user) {
+    // Todos los usuarios autenticados pueden escuchar este canal
+    return $user != null;
+});
+Broadcast::channel('dashboard.{idDocente}', function ($user, $idDocente) {
+    return (int) $user->id_usuario === (int) $idDocente;
+});
+
+

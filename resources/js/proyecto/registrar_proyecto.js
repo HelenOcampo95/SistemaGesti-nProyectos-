@@ -1,4 +1,4 @@
-import { createApp } from "vue/dist/vue.esm-bundler";
+import { createApp } from 'vue';
 import { activarLoadBtn, desactivarLoadBtn } from "@/store/ayudas/Load";
 import Swal from "sweetalert2"; // 👈 Importamos SweetAlert2
 
@@ -6,6 +6,8 @@ const appProyectos = createApp({
     data() {
         return {
             tabla: null,
+            colaboradores: [],
+            nuevo_correo: '',
         }
     },
     mounted(){
@@ -77,6 +79,74 @@ const appProyectos = createApp({
             },
 
         });
+
+        $('#id_rol').select2({
+            placeholder: 'Seleccione un usuario',
+            allowClear: true,
+            ajax: {
+                url: '/select-rol',
+                dataType: 'json',
+                type: 'get',
+                delay: 300,
+                data: params => {
+                    return {
+                        busqueda: params.term, // Lo que el usuario escribe
+                        page: params.page
+                    }
+                },
+                processResults: data => {
+                    // Transformamos los datos para que Select2 los entienda (id y text)
+                    return {
+                        results: data.map(item => ({
+                            id: item.id_rol,
+                            text: item.name // Puedes concatenar: item.nombre_usuario + ' ' + item.apellido_usuario
+                        }))
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $(document).ready(function() {
+        // Función para dar formato a las opciones
+        function formatRol(item) {
+            // Si no hay ID (como el placeholder), devolver el texto normal
+            if (!item.id) {
+                return item.text;
+            }
+
+            // Extraer datos de los atributos 'data-' del <option>
+            var icon = $(item.element).data('icon');
+            var color = $(item.element).data('color');
+            var desc = $(item.element).data('desc');
+
+            // Construir el HTML "bonito"
+            var $result = $(
+                '<div class="d-flex align-items-center">' +
+                    '<div class="symbol symbol-30px me-3">' +
+                        '<span class="symbol-label bg-light">' +
+                            '<i class="bi ' + icon + ' ' + color + ' fs-3"></i>' +
+                        '</span>' +
+                    '</div>' +
+                    '<div class="d-flex flex-column">' +
+                        '<span class="fw-bold fs-6">' + item.text + '</span>' +
+                        '<span class="text-muted fs-7">' + desc + '</span>' +
+                    '</div>' +
+                '</div>'
+            );
+
+            return $result;
+        }
+
+        $('#id_rol').select2({
+            placeholder: 'Seleccione un rol',
+            allowClear: true,
+            minimumResultsForSearch: Infinity,
+            templateResult: formatRol,      // Formato en la lista desplegable
+            templateSelection: formatRol   // Formato cuando ya está seleccionado
+        });
+    });
+
 
         document.addEventListener('DOMContentLoaded', function() {
             const chipsContainer = document.getElementById('chipsContainer');
@@ -208,51 +278,50 @@ const appProyectos = createApp({
             });
 
         },
+        agregarColaborador() {
+            const correo = this.nuevo_correo.trim().toLowerCase();
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (correo === '') return;
+            
+            if (!regex.test(correo)) {
+                return Swal.fire('Correo inválido', 'Por favor ingresa un email real', 'warning');
+            }
+
+            if (this.colaboradores.includes(correo)) {
+                return Swal.fire('Repetido', 'Este correo ya está en la lista', 'info');
+            }
+
+            this.colaboradores.push(correo);
+            this.nuevo_correo = '';
+        },
+
+        eliminarColaborador(index) {
+            this.colaboradores.splice(index, 1);
+        },
+
         crearProyecto() {
             activarLoadBtn('btn_crear_proyecto');
 
-            // Serializamos el formulario
-            let form = $('#formulario_registrar_proyecto').serialize();
-            console.log("Datos enviados:", form);
+            // Recolectamos datos manualmente para incluir el array de colaboradores
+            const datos = {
+                nombre_proyecto: $('#nombre_proyecto').val(),
+                descripcion_proyecto: $('#descripcion_proyecto').val(),
+                fecha_inicio: $('#fecha_inicio').val(),
+                fecha_entrega: $('#fecha_entrega').val(),
+                estado_proyecto: $('#estado_proyecto').val(),
+                id_categoria: $('#id_categoria').val(),
+                colaboradores: this.colaboradores // <--- Array de Vue
+            };
 
-            axios.post('/proyectos', form)
-                .then(() => {
-                    Swal.fire({
-                        title: '¡Éxito!',
-                        text: 'El proyecto fue creado correctamente',
-                        icon: 'success',
-                        confirmButtonText: 'Aceptar'
-                    }).then(() => {
-                        // 🔄 Recargar la página después de aceptar
-                        window.location.reload();
-                    });
-
-                    $('#modal_registrar_proyecto').modal('hide');
-                    $('#formulario_registrar_proyecto')[0].reset();
+            axios.post('/proyectos', datos)
+                .then(response => {
+                    Swal.fire('¡Éxito!', 'Proyecto y colaboradores registrados', 'success')
+                        .then(() => window.location.reload());
                 })
                 .catch(error => {
-                    if (error.response) {
-                        console.log("Respuesta completa del servidor:", error.response);
-                    } else {
-                        console.log("Error sin response:", error);
-                    }
-
-                    if (error.response && error.response.status === 422) {
-                        Swal.fire({
-                            title: 'Hace falta información',
-                            text: 'Por favor completa todos los campos requeridos',
-                            icon: 'error',
-                            confirmButtonText: 'Entendido'
-                        });
-                        return;
-                    }
-
-                    Swal.fire({
-                        title: '¡Vaya!',
-                        text: 'Ocurrió un error, contacta soporte',
-                        icon: 'error',
-                        confirmButtonText: 'Cerrar'
-                    });
+                    console.error(error);
+                    Swal.fire('Error', 'No se pudo crear el proyecto', 'error');
                 })
                 .finally(() => {
                     desactivarLoadBtn('btn_crear_proyecto');

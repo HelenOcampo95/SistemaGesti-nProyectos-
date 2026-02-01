@@ -1,4 +1,4 @@
-import { createApp } from "vue/dist/vue.esm-bundler";
+import { createApp } from 'vue';
 import { activarLoadBtn, desactivarLoadBtn } from "@/store/ayudas/Load";
 import Swal from "sweetalert2"; // 👈 Importamos SweetAlert2
 import spanish from '../data_tables/spanish.json';
@@ -35,6 +35,7 @@ const appCategorias = createApp({
             },
             "columns": [
                 {data: "nombre_proyecto", name: "nombre_proyecto" },
+                { data: "titulo_tarea", name: "titulo_tarea" },
                 { data: "descripcion_tarea", name: "descripcion_tarea" },
                 { data: "fecha_entrega", name: "fecha_entrega"},
                 { data: "estado_tarea", name: "estado_tarea"},
@@ -77,12 +78,14 @@ const appCategorias = createApp({
         $('#listadoDeTareas tbody').on('click', '.editar-tarea', function(e) {
         e.preventDefault();
 
-                const id_tarea = $(this).data('id_tarea');
-                const descripcion = $(this).data('descripcions');
+                const id_tarea      = $(this).data('id_tarea');
+                const titulo        = $(this).data('titulo');
+                const descripcion   = $(this).data('descripcions');
                 const observaciones = $(this).data('observaciones');
 
 
                 $('#id_tarea_editar').val(id_tarea); 
+                $('#titulo_tarea_editar').val(titulo)
                 $('#descripcion_tarea_editar').val(descripcion);
                 $('#observaciones_tarea_editar').val(observaciones);
             
@@ -220,6 +223,7 @@ const appCategorias = createApp({
             editarTarea(){
                 // Obtenemos los datos del formulario de edición
                 const id_tarea = $('#id_tarea_editar').val(); 
+                const titulo_tarea = $('#titulo_tarea_editar').val();
                 const descripcion_tarea = $('#descripcion_tarea_editar').val();
                 const observaciones_docente = $('#observaciones_tarea_editar').val();
                 // Validaciones básicas (opcional)
@@ -230,6 +234,7 @@ const appCategorias = createApp({
 
                 // Enviamos la solicitud de actualización con Axios
                 axios.post(`actualizar-tarea/${id_tarea}`, {
+                    titulo_tarea: titulo_tarea,
                     descripcion_tarea: descripcion_tarea,
                     observaciones_docente: observaciones_docente
                 })
