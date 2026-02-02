@@ -29,7 +29,7 @@ class Usuarios extends Authenticatable
         'cedula',
         'correo_usuario',
         'contrasena_usuario',
-        'id_rol',
+        
     ];
 
     protected $hidden = [

@@ -22,5 +22,8 @@ class Categorias extends Model
         'nombre_categoria',
         'descripcion_categoria',
     ];
-
+    public function proyectos()
+    {
+        return $this->hasMany(Proyecto::class, 'id_facultad');
+    }
 }

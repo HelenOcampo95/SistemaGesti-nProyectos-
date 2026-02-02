@@ -41,10 +41,11 @@
                 </div>
             </div>
             <div class="card border-0 shadow-sm">
-                <div class="card-header border-0 pt-5 bg-white text-center">
-                    <h3 class="card-title fw-bolder">Estado de Tareas</h3>
-                </div>
-                <div class="card-body" style="width:450px">
+                <div class="fw-bold fs-7 text-gray-800 p-4 ">Seguimiento de Proyectos</div>
+                <div class="card-body d-flex">
+                    <div style="background-color: rgba(172, 41, 41, 0.295); padding: 15px; border-radius: 8px;">  
+
+                    </div>
                     <div style="background-color: rgba(224, 224, 224, 0.295); padding: 15px; border-radius: 8px;">
                         <span class="fs-7 fw-semibold text-gray-600 text-uppercase">Total de tareas</span>
                         <div style="height: 250px; position: relative;"> 
@@ -79,14 +80,14 @@
                                             <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
                                             <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
                                         </svg>
-                                        <span class="fs-2 fw-bold text-gray-800 lh-1">0</span>
+                                        <span class="fs-2 fw-bold text-gray-800 lh-1">{{$estudiantes}}</span>
                                     </div>
                                     <span class="fs-6 fw-semibold text-gray-400">Estudiantes Activos</span>
                                 </div>        
                             </div>
                             </div>
                             <div style="background-color: rgba(224, 224, 224, 0.295); padding: 15px; border-radius: 8px;">
-                                <span class="fs-7 fw-semibold text-gray-600 text-uppercase">Participación de Proyectos por Facultad</span>
+                                <span class="fs-8 fw-semibold text-gray-600 text-uppercase">Participación de Proyectos por Facultad</span>
                                 <div style="flex: 1.5; height: 200px; max-width: 450px;"> 
                                     <canvas id="graficoFacultades"></canvas>
                                 </div>
@@ -106,7 +107,8 @@
     data-inicial-proyectos-activos="{{ $proyectosActivos }}"
     data-inicial-proyectos-finalizados="{{ $proyectosFinalizados }}"
     data-inicial-proyectos-atrasados="{{ $proyectosAtrasados }}"
-    data-inicial-proyectos-avalados="{{ $proyectosAvalados }}">
+    data-inicial-proyectos-avalados="{{ $proyectosAvalados }}"
+    data-inicial-estudiantes="{{ $estudiantes }}">
 @endsection
 
 @section('scripts')

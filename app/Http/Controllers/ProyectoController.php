@@ -25,6 +25,7 @@ class ProyectoController extends Controller
             // Especificamos la tabla para evitar la ambigüedad
             $query->where('participantes_proyecto.id_usuario', $userId);
         })
+        ->orWhere('id_usuario', $userId)
         ->orWhere('id_docente_director', $userId) // Asegúrate de que estos nombres coincidan con tu DB
         ->orWhere('id_docente_lider', $userId)
         ->paginate(9);

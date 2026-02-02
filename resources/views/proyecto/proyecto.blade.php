@@ -29,58 +29,81 @@
                 @endcan
                 </div>
         </div>
-		<div id="kt_app_content" class="app-content flex-column-fluid">
-		<div id="kt_app_content" class="app-content flex-column-fluid">
+
 		<div id="kt_app_content_container" class="app-container container-xxl">
-			
-			<div class="row g-6"> 
-				@foreach ($proyectos as $proyecto)
-    <div class="col-md-6 col-xl-4 mb-7"> <div class="card card-flush border-hover-primary h-100 shadow-sm"> <div class="card-header pt-5 px-7 border-0">
-                <div class="card-title m-0">
-                    <div class="symbol symbol-45px symbol-circle">
-                        <span class="symbol-label bg-light-primary text-primary fs-3 fw-bold">
-                            {{ substr($proyecto->nombre_proyecto, 0, 1) }}
-                        </span>
+    <div class="row g-6">
+
+        @forelse ($proyectos as $proyecto)
+            <div class="col-md-6 col-xl-4 mb-7">
+                <div class="card card-flush border-hover-primary h-100 shadow-sm">
+                    <div class="card-header pt-5 px-7 border-0">
+                        <div class="card-title m-0">
+                            <div class="symbol symbol-45px symbol-circle">
+                                <span class="symbol-label bg-light-primary text-primary fs-3 fw-bold">
+                                    {{ substr($proyecto->nombre_proyecto, 0, 1) }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-toolbar">
+                            <span class="badge badge-light-success fw-bold fs-8 px-3 py-1">
+                                {{ $proyecto->estado_proyecto }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="card-body px-7 py-5 d-flex flex-column">
+                        <a href="{{ url('detalle/'.$proyecto->id_proyecto) }}"
+                           class="text-gray-900 text-hover-success fw-bold fs-4 mb-1">
+                            {{ $proyecto->nombre_proyecto }}
+                        </a>
+
+                        <div class="text-muted fs-7 fw-semibold mb-4">
+                            <i class="ki-duotone ki-calendar-8 fs-7 me-1"></i>
+                            {{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->translatedFormat('d M, Y') }}
+                        </div>
+
+                        <p class="text-gray-600 fs-6 mb-6 flex-grow-1">
+                            {{ $proyecto->descripcion_proyecto }}
+                        </p>
+
+                        <div class="d-flex flex-stack pt-4">
+                            <a href="{{ url('detalle/'.$proyecto->id_proyecto) }}"
+                               class="btn btn-sm btn-light-success fw-bold px-4">
+                                Abrir Proyecto
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <div class="card-toolbar">
-                    <span class="badge badge-light-success fw-bold fs-8 px-3 py-1">{{$proyecto->estado_proyecto}}</span>
-                </div>
             </div>
 
-            <div class="card-body px-7 py-5 d-flex flex-column">
-                <a href="{{ url('detalle/'.$proyecto->id_proyecto) }}" class="text-gray-900 text-hover-success fw-bold fs-4 mb-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.4em;">
-                    {{ $proyecto->nombre_proyecto }}
-                </a>
+        @empty
+            {{-- TARJETA MOTIVADORA --}}
+            <div class="col-12">
+                <div class="card card-flush h-100 text-center py-10">
+                    <div class="card-body">
+                        <i class="ki-duotone ki-rocket fs-3x text-success mb-5"></i>
 
-                <div class="text-muted fs-7 fw-semibold mb-4">
-                    <i class="ki-duotone ki-calendar-8 fs-7 me-1"></i>
-                    {{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->translatedFormat('d M, Y') }}
-                </div>
-
-                <p class="text-gray-600 fs-6 mb-6 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-                    {{ $proyecto->descripcion_proyecto }}
-                </p>
-
-                <div class="d-flex flex-stack pt-4">
-                    <a href="{{ url('detalle/'.$proyecto->id_proyecto) }}" class="btn btn-sm btn-light-success fw-bold px-4">
-                        Abrir Proyecto
-                        <i class="ki-duotone ki-arrow-right fs-4 ms-1"></i>
-                    </a>
+                        <h3 class="fw-bold fs-2 mb-3">
+                            Aún no tienes proyectos
+                        </h3>
+                        <p class="text-muted fs-5 mb-6">
+                            Empieza creando tu primer proyecto y gestiona todo desde aquí.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endforelse
+
     </div>
-@endforeach
-                <div class="mt-4">
-                    {{ $proyectos->links() }}
-                </div>
-			</div>
-			
-		</div>
-</div>
-</div>
+
+    @if ($proyectos->count())
+        <div class="mt-4">
+            {{ $proyectos->links() }}
         </div>
+    @endif
+</div>
+
+    </div>
 </div>
 
 <div class="modal fade" id="modal_registrar_proyecto" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
@@ -121,7 +144,7 @@
                             <input type="text" class="form-control form-control-solid" placeholder="" name="estado_proyecto" id="estado_proyecto"/>
                         </div>
                         <div class="mb-5 fv-row mb-7">
-                            <label class="fs-6 fw-semibold mb-2 required">Categoria</label>
+                            <label class="fs-6 fw-semibold mb-2 required">Facultad</label>
                             <select  class="form-select form-select-solid" data-placeholder="Seleccione una categoria" name="id_categoria" id="id_categoria"></select>
                         </div>
                         <div class="mb-3">

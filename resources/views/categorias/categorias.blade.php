@@ -31,9 +31,21 @@
 					<!--end::Page title-->
 					<!--begin::Actions-->
 					<div class="d-flex align-items-center gap-2 gap-lg-3">
-						<a href="#" class="btn btn-sm fw-bold btn-success" data-bs-toggle="modal" data-bs-target="#modal_registrar_categoria">Crear categoria</a>
-						<!--end::Primary button-->
+						<a href="#"
+						class="btn btn-sm fw-bold btn-success"
+						data-bs-toggle="modal"
+						data-bs-target="#modal_asignar_docente">
+							Asignar docente
+						</a>
+
+						<a href="#"
+						class="btn btn-sm fw-bold btn-success"
+						data-bs-toggle="modal"
+						data-bs-target="#modal_registrar_categoria">
+							Crear categoría
+						</a>
 					</div>
+
 					<!--end::Actions-->
 				</div>
 			<!--end::Toolbar container-->
@@ -59,7 +71,7 @@
 							</div>
 						<!-- ./ Input buscador de materias primas -->
 						</div>
-                	</div>
+                </div>
 					<div class="card-body pt-9 pb-0">
 						<table class="table display responsive table-row-bordered gy-5 table-striped" id="listadoDeCategorias" >
 							<thead>
@@ -122,6 +134,49 @@
     </div>
 </div>
 
+<!-- Modal asignar docente -->
+<div class="modal fade" id="modal_asignar_docente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mw-650px">
+        <div class="modal-content" id="asignar_docente_content">
+            <form class="form" id="formulario_asignar_docente">
+                <div class="modal-header" id="header_asignar_docente">
+                    <h2 class="fw-bold">Asignar docente responsable </h2>
+                    <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal" aria-label="Close">
+                        ✖
+                    </div>
+                </div>
+                <div class="modal-body py-10 px-lg-17">
+                    <div class="mb-5 fv-row">
+                        <label class="fs-6 fw-semibold mb-2 required">Nombre de la Facultad</label>
+                        <input type="text" class="form-control form-control-solid" 
+                            id="nombre_categoria_registrar" 
+                            name="nombre_categoria" />
+                    </div>
+                    <div class="mb-5 fv-row">
+                        <label class="form-label">Docente Director</label>
+						<input type="text" class="form-control form-control-solid" 
+                            id="nombre_categoria_registrar" 
+                            name="nombre_categoria" />
+                    </div>
+					<div class="mb-5 fv-row">
+                        <label class="form-label">Docente Lider</label>
+						<input type="text" class="form-control form-control-solid" 
+                            id="nombre_categoria_registrar" 
+                            name="nombre_categoria" />
+                    </div>
+                </div>
+                <div class="modal-footer flex-center">
+                    <button type="button" id="btn_registrar_categoria" class="btn btn-success" @click.prevent="registrarCategoria">
+                        <span class="indicator-label">Registrar docente</span>
+                        <span class="indicator-progress">Por favor espere...
+                            <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <!-- Modal Editar -->
 <div class="modal fade" id="modal_editar_categoria" tabindex="-1" aria-hidden="true">

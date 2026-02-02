@@ -200,7 +200,7 @@
                                         </div>
                                     </div>
                                 @endrole
-                                @can('Registrar tareas')
+                                @role(['Docente Lider', 'Administrador'])
                                     <div class="menu-item">
                                         <a class="menu-link" href="{{ route('tareas') }}">
                                             <span class="menu-icon">
@@ -209,7 +209,7 @@
                                             <span class="menu-title">Tareas</span>
                                         </a>
                                     </div>
-                                @endcan
+                                @endrole
                                 @can('Registrar usuarios')
                                     <div class="menu-item">
                                         <a class="menu-link" href="{{ route('tareas') }}">

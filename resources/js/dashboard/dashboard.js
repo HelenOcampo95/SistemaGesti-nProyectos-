@@ -16,6 +16,8 @@ const appDashboard = createApp({
             proyectosAvalados: 0,
             proyectosActivos: 0,
             proyectosFinalizados:0,
+            participacion: [],
+            estudiantes: 0,
 
             // Instancias de Chart.js
             graficoDona: null,
@@ -30,27 +32,26 @@ const appDashboard = createApp({
         
         this.cargarDashboard();
 
-        // Echo.channel('dashboard.institucional')
-        //     .listen('.ProyectoCreado', () => {
-        //         this.cargarDashboard(); 
-        //     }); 
-            Echo.channel('dashboard.institucional')
-                .listen('.DashboardDataEvent', (e) => {
-                    this.cargarDashboard(); 
+        Echo.channel('dashboard.institucional')
+            .listen('.DashboardDataEvent', (e) => {
+                this.cargarDashboard(); 
 
-                this.actualizarGraficoDona(
-                    e.dashboard.totalPendientes,
-                    e.dashboard.totalEnProceso,
-                    e.dashboard.totalFinalizado
-                );
+            this.actualizarGraficoDona(
+                e.dashboard.totalPendientes,
+                e.dashboard.totalEnProceso,
+                e.dashboard.totalFinalizado
+            );
+            this.participacion = e.dashboard.participacion;
+            this.estudiantes = e.dashboard.estudiantes;
+            this.initGraficoFacultades();
 
-                this.totalProyectos       = e.dashboard.totalProyectos;
-                this.proyectosActivos     = e.dashboard.proyectosActivos;
-                this.proyectosFinalizados = e.dashboard.proyectosFinalizados;
-                this.proyectosAtrasados   = e.dashboard.proyectosAtrasados;
-                this.proyectosAvalados    = e.dashboard.proyectosAvalados;
-            });
-        },
+            // this.totalProyectos       = e.dashboard.totalProyectos;
+            // this.proyectosActivos     = e.dashboard.proyectosActivos;
+            // this.proyectosFinalizados = e.dashboard.proyectosFinalizados;
+            // this.proyectosAtrasados   = e.dashboard.proyectosAtrasados;
+            // this.proyectosAvalados    = e.dashboard.proyectosAvalados;
+        });
+    },
     methods: {
         initGraficoDona() {
             const ctx = document.getElementById('graficoDonaTareas');
@@ -116,6 +117,8 @@ const appDashboard = createApp({
                         res.data.totalEnProceso, 
                         res.data.totalFinalizado
                     );
+                    this.initGraficoFacultades(); 
+                    
                 });
         },
 
@@ -123,49 +126,80 @@ const appDashboard = createApp({
             const ctx = document.getElementById('graficoFacultades');
             if (!ctx) return;
 
+            const labels = this.participacion.map(p => p.facultad);
+            const data = this.participacion.map(p => p.porcentaje);
+
+            if (this.graficoFacultades) {
+                this.graficoFacultades.data.labels = labels;
+                this.graficoFacultades.data.datasets[0].data = data;
+                this.graficoFacultades.update();
+                return;
+            }
+
             this.graficoFacultades = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Salud', 'Ingeniería', 'Artes', 'Educación'],
+                    labels: labels,
                     datasets: [{
-                        data: [19, 15, 8, 8],
-                        backgroundColor: '#8ee0c9',
-                        borderRadius: 4,
-                        barThickness: 12,
+                        data: data,
+                        borderRadius: 5,
+                        barThickness: 10,
+                        backgroundColor: '#d3ebc2',
                     }]
                 },
                 options: {
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                            tooltip: {
+                            enabled: true,
+                            backgroundColor: 'rgba(71, 71, 71, 0.8)', 
+                            titleFont: { size: 12 },
+                            bodyFont: { size: 12 },
+                            callbacks: {
+                                title: (items) => {
+                                    
+                                    return this.participacion[items[0].dataIndex].facultad;
+                                },
+                                label: (context) => {
+                                    return ` Participación: ${context.raw}%`;
+                                }
+                            }
+                        } },
                     scales: {
-                        x: { display: false, beginAtZero: true, max: 25 },
-                        y: { 
-                            grid: { display: false }, 
+                        x: { display: false, beginAtZero: true },
+                        y: {
+                            grid: { display: false },
                             border: { display: false },
-                            ticks: { font: { weight: 'bold' } }
+                            ticks: { font: { 
+                                weight: 'bold',
+                                size: 10 
+                            } }
                         }
                     },
-                    layout: { padding: { right: 40 } }
+                    layout: { padding: { right: 30 } }
                 },
                 plugins: [{
                     id: 'labelsAlFinal',
                     afterDatasetsDraw(chart) {
                         const { ctx, data } = chart;
                         ctx.save();
-                        ctx.font = 'bold 12px Arial';
+                        ctx.font = 'bold 10px Arial';
                         ctx.fillStyle = '#333';
                         ctx.textAlign = 'left';
                         ctx.textBaseline = 'middle';
+                        
                         chart.getDatasetMeta(0).data.forEach((bar, index) => {
                             const valor = data.datasets[0].data[index];
-                            ctx.fillText(valor, bar.x + 5, bar.y);
+                            ctx.fillText(`${valor}%`, bar.x + 5, bar.y);
                         });
                     }
                 }]
             });
-        },
+        }
+
     } 
 });
 
