@@ -27,7 +27,7 @@ createApp({
         }
     },
     mounted() {
-        console.log('✅ Vue montado correctamente en #app_inicio')
+        
     },
     methods: {
         async enviarFormularioInicioSesion() {

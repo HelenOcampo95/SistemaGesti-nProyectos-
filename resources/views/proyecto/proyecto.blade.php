@@ -53,7 +53,7 @@
 
                     <div class="card-body px-7 py-5 d-flex flex-column">
                         <a href="{{ url('detalle/'.$proyecto->id_proyecto) }}"
-                           class="text-gray-900 text-hover-success fw-bold fs-4 mb-1">
+                            class="text-gray-900 text-hover-success fw-bold fs-4 mb-1">
                             {{ $proyecto->nombre_proyecto }}
                         </a>
 
@@ -68,7 +68,7 @@
 
                         <div class="d-flex flex-stack pt-4">
                             <a href="{{ url('detalle/'.$proyecto->id_proyecto) }}"
-                               class="btn btn-sm btn-light-success fw-bold px-4">
+                                class="btn btn-sm btn-light-success fw-bold px-4">
                                 Abrir Proyecto
                             </a>
                         </div>
@@ -122,26 +122,57 @@
                         
                         <div class="fv-row mb-7">
                             <label class="fs-6 fw-semibold mb-2 required">Nombre del Proyecto</label>
-                            <input type="text" class="form-control form-control-solid" name="nombre_proyecto" id="nombre_proyecto" placeholder="Ej: Rediseño Web" />
+                            <input type="text" class="form-control form-control-solid" 
+                                name="nombre_proyecto" 
+                                id="nombre_proyecto" 
+                                placeholder="Ej: Rediseño Web" 
+                                v-model="formProyecto.nombreProyecto"
+                                :class="{ 'border-danger': excedidos.nombre}"
+                                :maxlength="limites.nombreProyecto"/>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small v-if="excedidos.nombre" class="text-danger">
+                                    Límite máximo alcanzado.
+                                </small>
+                            </div>
                         </div>
 
                         <div class="fv-row mb-7">
                             <label class="fs-6 fw-semibold mb-2">Descripción</label>
-                            <textarea class="form-control form-control-solid" name="descripcion_proyecto" id="descripcion_proyecto" rows="3"></textarea>
+                            <textarea class="form-control form-control-solid" 
+                                name="descripcion_proyecto" 
+                                id="descripcion_proyecto" 
+                                rows="3"
+                                v-model="formProyecto.descripcionProyecto"
+                                :class="{ 'border-danger': excedidos.descripcion}"
+                                :maxlength="limites.descripcionProyecto">
+                            </textarea>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small
+                                    :class="excedidos.descripcionProyecto ? 'text-danger' : 'text-muted'"
+                                    v-text="formProyecto.descripcionProyecto.length + ' / ' + limites.descripcionProyecto + ' caracteres'">
+                                </small>
+                                <small  v-if="excedidos.descripcion" class="text-danger">
+                                    Límite máximo alcanzado.
+                                </small>
+                            </div>
                         </div>
                         <div class="row mt-5 mb-4">  
                             <div class="col-12 col-md-6">
                                 <label class="fs-6 fw-semibold mb-2 required" >Fecha inicio</label>
-                                <input type="text" class="form-control form-control-solid" id="fecha_inicio" placeholder="" name="fecha_inicio" value="" />
+                                <input type="text" 
+                                    class="form-control form-control-solid" 
+                                    id="fecha_inicio"  
+                                    name="fecha_inicio"  
+                                    autocomplete="off"/>
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="fs-6 fw-semibold mb-2 required" >Fecha entrega</label>
-                                <input type="text" class="form-control form-control-solid" id="fecha_entrega" placeholder="" name="fecha_entrega" value="" />
+                                <input type="text" 
+                                    class="form-control form-control-solid"
+                                    id="fecha_entrega" 
+                                    name="fecha_entrega"
+                                    autocomplete="off"/>
                             </div>
-                        </div>
-                        <div class="mb-5 fv-row mb-7">
-                            <label class="fs-6 fw-semibold mb-2 required">Estado</label>
-                            <input type="text" class="form-control form-control-solid" placeholder="" name="estado_proyecto" id="estado_proyecto"/>
                         </div>
                         <div class="mb-5 fv-row mb-7">
                             <label class="fs-6 fw-semibold mb-2 required">Facultad</label>
@@ -167,7 +198,7 @@
 
                 <div class="modal-footer flex-center">
                     <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal">Descartar</button>
-                    <button type="button" id="btn_crear_proyecto" class="btn btn-primary" @click.prevent="crearProyecto">
+                    <button type="button" id="btn_crear_proyecto" class="btn btn-success" @click.prevent="crearProyecto">
                         <span class="indicator-label">Registrar Proyecto</span>
                         <span class="indicator-progress">Espere... <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
                     </button>

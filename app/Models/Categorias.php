@@ -24,6 +24,6 @@ class Categorias extends Model
     ];
     public function proyectos()
     {
-        return $this->hasMany(Proyecto::class, 'id_facultad');
+        return $this->hasMany(Proyecto::class, 'id_categoria');
     }
 }

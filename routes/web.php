@@ -3,12 +3,15 @@
 use App\Http\Controllers\AutenticacionController;
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\TareasController;
 use App\Http\Controllers\UsuariosController;
+use App\Http\Controllers\VersionesController;
 use App\Models\Categorias;
 use App\Models\Proyecto;
 use App\Models\Role;
+use App\Models\Tareas;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -63,6 +66,7 @@ Route::middleware('permisos:Crear_proyecto')->group( function() {
     Route::get('/detalle/{id_proyecto}', [ProyectoController::class, 'detalleProyecto'])->name('detalle');
     Route::post('/actualizar-proyecto', [ProyectoController::class, 'actualizarProyecto'])->name('proyecto.actualizar');
     Route::get('/select-proyecto', [ProyectoController::class, 'selectProyecto']);
+    Route::post('/vincular-estudiante', [ProyectoController::class, 'vincularEstudiante']);
 
 //Listar todos los proyectos para lideres y directores
 Route::get('/ver-proyectos', [ProyectoController::class, 'verListadoProyecto'])->name('listarProyectos');
@@ -78,18 +82,30 @@ Route::post('/registrar/categoria', [CategoriasController::class, 'registrarCate
 Route::get('/ver-categoria/{id_categoria}', [CategoriasController::class, 'categoriaPorId']);
 Route::post('/actualizar-categoria/{id_categoria}', [CategoriasController::class, 'actualizarCategoria'] );
 Route::post('/eliminar-categoria/{id_categoria}', [CategoriasController::class, 'eliminarCategoria']);
+Route::post('/asignar-docente', [CategoriasController::class, 'asignarCategoriaDocente']);
 
 
 Route::get('/categoria/select-categoria', [ProyectoController::class, 'traerCategoria']);
 Route::get('/usuarios/select-usuarios', [ProyectoController::class, 'traerUsuario']);
+Route::get('/docentes/select-docentes-director', [CategoriasController::class, 'selectListarDocentesDirector']);
+Route::get('/docentes/select-docentes-lider', [CategoriasController::class, 'selectListarDocentesLider']);
+
 
 
 Route::post('/asignar-tarea', [TareasController::class, 'asignarTarea' ]);
 Route::get('/listar-tareas', [TareasController::class, 'listarTareas']);
-Route::delete('/eliminar-tarea/{id_tarea}', [TareasController::class, 'eliminarTarea']);
+Route::post('/eliminar-tarea/{id_tarea}', [TareasController::class, 'eliminarTarea']);
 Route::post('/actualizar-tarea/{id_tarea}', [TareasController::class, 'actualizarTarea']);
 Route::get('/tarea/{id_tarea}', [TareasController::class, 'detalleTarea'])->name('tarea');
 Route::post('/entregar-tarea/{id_tarea}', [TareasController::class, 'entregarTarea']);
+Route::post('/calificar-tarea/{id_tarea}', [TareasController::class, 'calificarTarea']);
+
+Route::get('/version/{id_version}', [VersionesController::class, 'verVersion']);
+Route::post('/aceptar-version/{id_version}', [VersionesController::class, 'aceptarVersion']);
+Route::post('/rechazar-version/{id_version}', [VersionesController::class, 'rechazarVersion']);
+
+Route::get('/notificaciones/get', [NotificacionController::class, 'getNotificaciones']);
+Route::post('/notificaciones/leer/{id}', [NotificacionController::class, 'marcarComoLeida']);
 
 });
 

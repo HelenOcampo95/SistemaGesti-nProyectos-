@@ -24,5 +24,8 @@ Broadcast::channel('dashboard.institucional', function ($user) {
 Broadcast::channel('dashboard.{idDocente}', function ($user, $idDocente) {
     return (int) $user->id_usuario === (int) $idDocente;
 });
-
+Broadcast::channel('notificacion.creada.{id_usuario}', function ($user, $id_usuario) {
+    // El usuario solo puede escuchar su propio canal
+    return (int) $user->id_usuario === (int) $id_usuario;
+});
 

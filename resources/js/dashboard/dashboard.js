@@ -7,21 +7,28 @@ const appDashboard = createApp({
         return {
             // Variables de estado
             totalProyectos: 0, 
-            totalPendientes: 0,
-            totalEnProceso: 0,
-            totalFinalizado: 0,
+            totalAsignadas: 0,
+            totalEntregadas: 0,
+            totalFinalizadas: 0,
+            totalCorregidas: 0,
             idDocente: null,
 
+            totalTareas: 0,
             proyectosAtrasados: 0,
             proyectosAvalados: 0,
             proyectosActivos: 0,
             proyectosFinalizados:0,
             participacion: [],
             estudiantes: 0,
-
+            proyectosGeneral: 0,
+            tareas: [],
+            listarProyectos: [],
+            versiones: [],
+            porcentajeProyecto: [],
             // Instancias de Chart.js
             graficoDona: null,
-            graficoFacultades: null
+            graficoFacultades: null,
+            
         }
     },
     mounted() {
@@ -32,39 +39,35 @@ const appDashboard = createApp({
         
         this.cargarDashboard();
 
-        Echo.channel('dashboard.institucional')
+        Echo.channel('dashboard.creada')
             .listen('.DashboardDataEvent', (e) => {
                 this.cargarDashboard(); 
 
             this.actualizarGraficoDona(
-                e.dashboard.totalPendientes,
-                e.dashboard.totalEnProceso,
-                e.dashboard.totalFinalizado
+                e.dashboard.totalAsignadas,
+                e.dashboard.totalEntregadas,
+                e.dashboard.totalFinalizadas,
+                e.dashboard.totalCorregidas
             );
-            this.participacion = e.dashboard.participacion;
-            this.estudiantes = e.dashboard.estudiantes;
-            this.initGraficoFacultades();
-
-            // this.totalProyectos       = e.dashboard.totalProyectos;
-            // this.proyectosActivos     = e.dashboard.proyectosActivos;
-            // this.proyectosFinalizados = e.dashboard.proyectosFinalizados;
-            // this.proyectosAtrasados   = e.dashboard.proyectosAtrasados;
-            // this.proyectosAvalados    = e.dashboard.proyectosAvalados;
-        });
+            
+                this.initGraficoFacultades();
+            });
     },
     methods: {
         initGraficoDona() {
             const ctx = document.getElementById('graficoDonaTareas');
-            if (!ctx) return;
+            if (!ctx || this.totalTareas === 0) {
+                return;
+            }
 
             this.graficoDona = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Pendientes', 'En Proceso', 'Finalizadas'],
+                    labels: ['Asignadas', 'Entregadas', 'Finalizadas', 'Corregir'],
                     datasets: [{
-                        data: [this.totalPendientes, this.totalEnProceso, this.totalFinalizado],
-                        backgroundColor: ['#f8d7da', '#cff4fc', '#e1fccf'],
-                        borderColor: ['#842029', '#055160', '#226005'],
+                        data: [this.totalAsignadas, this.totalEntregadas, this.totalFinalizadas, this.totalCorregidas],
+                        backgroundColor: ['#dbd9d9', '#cff4fc', '#e1fccf', '#e2ab91'],
+                        borderColor: ['#424141', '#055160', '#226005', '#602e05'],
                         borderWidth: 1.5,
                         hoverOffset: 8
                     }]
@@ -82,20 +85,44 @@ const appDashboard = createApp({
                     layout: {
                         padding: { top: 10, bottom: 10 }
                     }
-                }
+                },
+                plugins: [{
+                    id: 'textoCentro',
+                    beforeDraw: (chart) => {
+                        const { width, height, ctx } = chart;
+                        ctx.save();
+
+                        ctx.font = 'bold 22px Arial';
+                        ctx.fillStyle = '#333';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
+
+                        ctx.font = 'bold 45px Arial';
+                    ctx.fillStyle = '#424141';
+                    ctx.fillText(this.totalTareas, width / 2, height / 2 -25);
+
+                    ctx.font = '12px Arial';
+                    ctx.fillStyle = '#999';
+                    ctx.fillText('Tareas totales', width / 2, height / 2 + 0);
+
+                        ctx.restore();
+                    }
+                }]
+
             });
         },
 
-        actualizarGraficoDona(pendientes, enProceso, finalizadas) {
+        actualizarGraficoDona(asignadas, entregadas, finalizada, corregir) {
             // 1. Actualizamos las variables de Vue para que las tarjetas cambien
-            this.totalPendientes = pendientes;
-            this.totalEnProceso = enProceso;
-            this.totalFinalizado = finalizadas;
+            this.totalAsignadas     = asignadas;
+            this.totalEntregadas    = entregadas;
+            this.totalFinalizadas   = finalizada;
+            this.totalCorregidas    = corregir
 
             // 2. Verificamos que el gráfico exista
             if (this.graficoDona) {
                 // 3. Actualizamos los datos internos de Chart.js
-                this.graficoDona.data.datasets[0].data = [pendientes, enProceso, finalizadas];
+                this.graficoDona.data.datasets[0].data = [asignadas, entregadas, finalizada, corregir];
                 
                 // 4. Renderizamos los cambios
                 this.graficoDona.update();
@@ -108,17 +135,35 @@ const appDashboard = createApp({
         cargarDashboard() {
             axios.get('/dashboard/data')
                 .then(res => {
-                    // Esto actualiza las variables de Vue
-                    Object.assign(this, res.data);
-
-                    // Esto fuerza la creación o actualización del gráfico
-                    this.actualizarGraficoDona(
-                        res.data.totalPendientes, 
-                        res.data.totalEnProceso, 
-                        res.data.totalFinalizado
-                    );
-                    this.initGraficoFacultades(); 
-                    
+                    this.estudiantes            = res.data.estudiantes;
+                    this.totalProyectos         = res.data.totalProyectos;
+                    this.totalAsignadas         = res.data.totalAsignadas;
+                    this.totalEntregadas        = res.data.totalEntregadas;
+                    this.totalFinalizadas       = res.data.totalFinalizadas;
+                    this.totalCorregidas        = res.data.totalCorregidas;
+                    this.proyectosActivos       = res.data.proyectosActivos;
+                    this.proyectosFinalizados   = res.data.proyectosFinalizados;
+                    this.proyectosAtrasados     = res.data.proyectosAtrasados;
+                    this.proyectosAvalados      = res.data.proyectosAvalados;
+                    this.participacion          = res.data.participacion;
+                    this.proyectosGeneral       = res.data.totalProyectosGeneral;
+                    this.totalTareas            = res.data.totalTareas;
+                    this.tareas                 = res.data.tareas;
+                    this.listarProyectos        = res.data.listarProyectos;
+                    this.versiones              = res.data.versiones;
+                    this.porcentajeProyecto     = res.data.porcentajeProyecto;
+                    this.$nextTick(() => {
+                        this.actualizarGraficoDona(
+                            res.data.totalAsignadas,
+                            res.data.totalEntregadas,
+                            res.data.totalFinalizadas,
+                            res.data.totalCorregidas
+                        );
+                        this.initGraficoFacultades();
+                    });
+                })
+                .catch(error => {
+                    console.error("Error al refrescar el dashboard:", error);
                 });
         },
 
@@ -143,8 +188,8 @@ const appDashboard = createApp({
                     datasets: [{
                         data: data,
                         borderRadius: 5,
-                        barThickness: 10,
-                        backgroundColor: '#d3ebc2',
+                        barThickness: 5,
+                        backgroundColor: '#b3eb8b',
                     }]
                 },
                 options: {
@@ -179,7 +224,7 @@ const appDashboard = createApp({
                             } }
                         }
                     },
-                    layout: { padding: { right: 30 } }
+                    layout: { padding: { right: 32 } }
                 },
                 plugins: [{
                     id: 'labelsAlFinal',
@@ -198,7 +243,8 @@ const appDashboard = createApp({
                     }
                 }]
             });
-        }
+        },
+        
 
     } 
 });

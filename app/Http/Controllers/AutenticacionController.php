@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\DashboardUpdated;
 use App\Models\Categorias;
+use App\Models\Role;
 use App\Models\Usuarios;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -17,7 +19,9 @@ class AutenticacionController extends Controller
 {
     public function vistaRegistrarme()
     { 
-        return view('iniciar_sesion.registrarme');
+        $roles = Role::all();
+
+        return view('iniciar_sesion.registrarme', compact('roles'));
     }
 
 
@@ -38,10 +42,10 @@ class AutenticacionController extends Controller
             $request->session()->regenerate();
 
             $intended = session()->pull('url.intended'); 
-            $redirectTo = $intended ?: route('proyecto');
+            $redirectTo = $intended ?: route('dashboard');
 
             if (url()->previous() === route('login')) {
-                $redirectTo = route('proyecto');
+                $redirectTo = route('dashboard');
             }
 
             return response()->json([
@@ -65,7 +69,7 @@ class AutenticacionController extends Controller
         ]);
 
         try {
-            return DB::transaction(function() use ($request) {
+            $usuarioCreado = DB::transaction(function() use ($request) {
                 $usuario = Usuarios::create([
                     'nombre_usuario'      => $request->nombre_usuario,
                     'apellido_usuario'    => $request->apellido_usuario,
@@ -74,10 +78,24 @@ class AutenticacionController extends Controller
                     'contrasena_usuario'  => Hash::make($request->contrasena_usuario),
                 ]);
                 $usuario->assignRole($request->id_rol);
-                Auth::login($usuario); // asegúrate que el modelo y guard están bien configurados
-
-                return response()->json(['message' => 'El usuario se ha creado correctamente'], 200);
+                return $usuario;
             });
+
+            DB::commit();
+            
+            $DashboardController = new DashboardController();
+            $data = $DashboardController->obtenerDashboardData($usuarioCreado->id_usuario);
+
+            $dataLimpia = json_decode(json_encode($data), true); 
+
+            event(new DashboardUpdated($dataLimpia));
+
+            // Ahora sí, logueamos al usuario para que pueda entrar al sistema
+            Auth::login($usuarioCreado);
+
+    return response()->json(['message' => 'Registrado correctamente'], 200);
+                
+            return response()->json(['message' => 'El usuario se ha creado correctamente'], 200);
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Error al registrar el usuario',
@@ -103,4 +121,6 @@ class AutenticacionController extends Controller
 
         return redirect()->route('login');
     }
+
+
 }

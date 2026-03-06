@@ -56,7 +56,7 @@ class ProyectoController extends Controller
             $proyecto->descripcion_proyecto = $request->descripcion_proyecto;
             $proyecto->fecha_inicio         = $request->fecha_inicio;
             $proyecto->fecha_entrega        = $request->fecha_entrega;
-            $proyecto->estado_proyecto      = $request->estado_proyecto;
+            $proyecto->estado_proyecto      = Proyecto::ACTIVO;
             $proyecto->id_categoria         = $request->id_categoria;
             $proyecto->id_usuario           = Auth::id();
             $proyecto->id_docente_director  = $regla->id_docente_director;
@@ -94,8 +94,10 @@ class ProyectoController extends Controller
             
             $DashboardController = new DashboardController();
             $data = $DashboardController->obtenerDashboardData($regla->id_docente_lider);
-    
-            event(new DashboardUpdated($data));
+
+            $dataLimpia = json_decode(json_encode($data), true); 
+
+            event(new DashboardUpdated($dataLimpia));
 
             return response()->json(['mensaje' => 'Proyecto creado con éxito', 'id' => $proyecto->id_proyecto], 200);
 
@@ -138,30 +140,37 @@ class ProyectoController extends Controller
 
         // 2. Traemos las tareas filtradas por estado, limitando a 5 por cada grupo
         // Usamos el método latest() para que aparezcan las más recientes primero
-        $pendientes = $proyecto->tareas()
-            ->where('estado_tarea', 'pendiente')
+        $asignadas = $proyecto->tareas()
+            ->where('estado_tarea', 'Asignada')
             ->oldest('fecha_entrega')
             ->take(5)
             ->get();
 
-        $enDesarrollo = $proyecto->tareas()
-            ->where('estado_tarea', 'en proceso') // Asegúrate de que el nombre del estado coincida con tu BD
+        $entregadas = $proyecto->tareas()
+            ->where('estado_tarea', 'Entregadas') // Asegúrate de que el nombre del estado coincida con tu BD
             ->oldest('fecha_entrega')
             ->take(5)
             ->get();
 
         $finalizadas = $proyecto->tareas()
-            ->where('estado_tarea', 'finalizada')
+            ->where('estado_tarea', 'Finalizada')
             ->oldest('fecha_entrega')
             ->take(5)
             ->get();
 
+        $corregir = $proyecto->tareas()
+            ->where('estado_tarea', 'Corregir')
+            ->oldest('fecha_entrega')
+            ->take(5)
+            ->get();    
+
         // 3. Pasamos todas las variables a la vista
         return view('proyecto.detalle_proyecto', compact(
             'proyecto', 
-            'pendientes', 
-            'enDesarrollo', 
+            'asignadas', 
+            'entregadas', 
             'finalizadas',
+            'corregir'
         ));
     }
 
@@ -220,6 +229,66 @@ class ProyectoController extends Controller
                 }
             })
             ->toJson();
+    }
+
+    // Cambia esto: public function vincularEstudiante(Request $request, $id_proyecto)
+// Por esto:
+    public function vincularEstudiante(Request $request) 
+    {
+        $request->validate([
+            // Eliminamos el prefijo 'sgp.' para que Laravel use la conexión por defecto
+            'id_proyecto'   => 'required|exists:proyecto,id_proyecto', 
+            'colaboradores' => 'required|array',
+            'colaboradores.*' => 'email'
+        ]);
+
+        $id_proyecto = $request->id_proyecto; 
+
+        DB::beginTransaction();
+
+        try {
+            if (!empty($request->colaboradores)) {
+                foreach ($request->colaboradores as $correo) {
+                    
+                    // 1. Buscamos o creamos al usuario
+                    $usuario = Usuarios::firstOrCreate(
+                        ['correo_usuario' => $correo],
+                        [
+                            'nombre_usuario'    => 'Invitado',
+                            'apellido_usuario'  => 'Pendiente',
+                            'id_rol'            => 2, 
+                            'cedula'            => '000' . rand(1000, 9999),
+                            'contrasena_usuario'=> bcrypt('123456')
+                        ]
+                    );
+
+                    // 2. Vinculamos al proyecto (Sin el prefijo sgp.)
+                    DB::table('participantes_proyecto')->updateOrInsert(
+                        [
+                            'id_usuario'  => $usuario->id_usuario,
+                            'id_proyecto' => $id_proyecto
+                        ],
+                        [
+                            'creado_en'      => now(),
+                            'actualizado_en' => now()
+                        ]
+                    );
+                }
+            }
+
+            DB::commit();
+            return response()->json(['mensaje' => 'Colaboradores vinculados con éxito'], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            // Log para que puedas ver el error real en storage/logs/laravel.log
+            Log::error("Error en vincularEstudiante: " . $e->getMessage());
+            
+            return response()->json([
+                'error' => 'Error al vincular',
+                'detalle' => $e->getMessage()
+            ], 500);
+        }
     }
     
 

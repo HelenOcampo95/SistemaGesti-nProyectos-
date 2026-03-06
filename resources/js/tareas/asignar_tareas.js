@@ -10,11 +10,30 @@ const appCategorias = createApp({
             tablaLista: {
                 draw: () => {}
             },
-            buscadorTareas: null
+            buscadorTareas: null,
+            
+            formTarea: {
+                tituloTarea: '',
+                descripcionTarea: '',
+                observacionTarea: '',
+                editarTituloTarea: '',
+                editarDescripcionTarea: '',
+                editarObservacionTarea: '',
+            },
+            // Agrupamos los límites en un solo lugar
+            limites: {
+                tituloTarea: 70,
+                descripcionTarea: 250,
+                observacionTarea: 250,
+                editarTituloTarea: 70,
+                editarDescripcionTarea: 250,
+                editarObservacionTarea: 250
+            }
         }
     },
     mounted(){
-        this.inicializarDatePicker('#fecha_entrega', false);
+        const self = this;
+        this.inicializarDatePicker('#fecha_entrega', true);
 
         this.tablaLista = $('#listadoDeTareas').DataTable({
             "language": spanish,
@@ -34,34 +53,67 @@ const appCategorias = createApp({
                 }
             },
             "columns": [
-                {data: "nombre_proyecto", name: "nombre_proyecto" },
+                { data: "nombre_proyecto", name: "nombre_proyecto" },
                 { data: "titulo_tarea", name: "titulo_tarea" },
-                { data: "descripcion_tarea", name: "descripcion_tarea" },
                 { data: "fecha_entrega", name: "fecha_entrega"},
                 { data: "estado_tarea", name: "estado_tarea"},
-                { data: "observaciones_docente", name: "observaciones_docente"},
                 { data: "porcentaje_avance", name: "porcentaje_avance"},
-                { data: "id_tarea", name:"id_tarea", sClass:"text-center botones",
-                render: function( data, type, row) {
-                    return `
-                        <a href="#" 
-                            class="btn btn-sm btn-light-success editar-tarea" 
-                            data-id_tarea="${data}" 
-                            data-descripcion="${row.descripcion_tarea}"
-                            style="margin-right: 4px;">
-                            Editar
-                        </a>
-                            `;
+                { 
+                    data: "actualizado_en", 
+                    name: "actualizado_en", // Corregido: El name debe coincidir con el data
+                    render: function(data) { 
+                        return self.formatarFechaHora(data); 
                     }
                 },
                 { 
-                data: "id_tarea", name:"id_tarea", sClass:"text-center botones",
-                        render: function(data, type, row) {
-                            return `
-                                    <a href="#" class="btn btn-sm btn-light-danger eliminar-tarea" data-id_tarea="${data}" style="margin-right: 4px;">Eliminar</a>
-                                `;
+                    data: "eliminado_en", 
+                    name: "eliminado_en", // Corregido: El name debe coincidir con el data
+                    render: function(data) { 
+                        return self.formatarFechaHora(data); 
+                    }
+                },
+                { 
+                    data: "id_tarea", 
+                    render: function(data, type, row) {
+                        // 1. Iniciamos con el botón de "Ver Detalle" (que todos ven)
+                        let html = `
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-light-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    Acciones
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item ver-detalle" href="javascript:void(0)" data-id="${data}">
+                                            <i class="fa fa-eye me-4"></i> Ver Detalle
+                                        </a>
+                                    </li>`;
+
+                        // 2. Verificamos el permiso de EDITAR
+                        if (window.permisosUsuario.canEditar) {
+                            html += `
+                                <li>
+                                    <a class="dropdown-item editar-tarea" href="javascript:void(0)" data-id_tarea="${data}">
+                                        <i class="fa fa-edit me-4"></i> Editar
+                                    </a>
+                                </li>`;
                         }
+
+                        // 3. Verificamos el permiso de ELIMINAR
+                        if (window.permisosUsuario.canEliminar) {
+                            html += `
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item eliminar-tarea" href="javascript:void(0)" data-id_tarea="${data}">
+                                        <i class="fa fa-trash text-gray me-4"></i> Eliminar
+                                    </a>
+                                </li>`;
+                        }
+
+                        html += `</ul></div>`;
+                        return html;
+                    }
                 }
+                
             ],
 
         });
@@ -75,21 +127,59 @@ const appCategorias = createApp({
 
         });
 
+        $('#listadoDeTareas tbody').on('click', '.ver-detalle', function(e) {
+        e.preventDefault();
+            const table = $('#listadoDeTareas').DataTable();
+            const data = table.row($(this).parents('tr')).data();
+
+            if (data) {
+                // 2. Llenar los textos básicos
+                $('#det_titulo').text(data.titulo_tarea || 'Sin título');
+                $('#det_proyecto').text(data.nombre_proyecto || 'Sin proyecto asignado');
+                $('#det_descripcion').text(data.descripcion_tarea || 'Sin descripción detallada.');
+                $('#det_observaciones').text(data.observaciones_docente || 'No hay comentarios del docente aún.');
+
+                // 3. Formatear la fecha de entrega usando tu método de Vue
+                // Nota: appCategorias es el nombre de tu constante de Vue
+                $('#det_entrega').text(appCategorias.formatarFechaHora ? appCategorias.formatarFechaHora(data.fecha_entrega) : data.fecha_entrega);
+
+                // 4. Estado estilizado (Badge)
+                let claseEstado = 'badge-light-primary';
+                if (data.estado_tarea === 'Completado') claseEstado = 'badge-light-success';
+                if (data.estado_tarea === 'Pendiente') claseEstado = 'badge-light-warning';
+                
+                $('#det_estado').html(`<span class="badge ${claseEstado} fw-bold px-3 py-2">${data.estado_tarea}</span>`);
+
+                // 5. Barra de progreso animada
+                let avance = parseInt(data.porcentaje_avance) || 0;
+                $('#det_avance_texto').text(avance + '%');
+                $('#det_avance_bar').css('width', avance + '%').attr('aria-valuenow', avance);
+
+                // 6. Mostrar el modal
+                $('#modal_ver_detalle').modal('show');
+            }
+        });
+
         $('#listadoDeTareas tbody').on('click', '.editar-tarea', function(e) {
         e.preventDefault();
 
-                const id_tarea      = $(this).data('id_tarea');
-                const titulo        = $(this).data('titulo');
-                const descripcion   = $(this).data('descripcions');
-                const observaciones = $(this).data('observaciones');
+            const table = $('#listadoDeTareas').DataTable();
+            const rowData = table.row($(this).parents('tr')).data();
 
-
-                $('#id_tarea_editar').val(id_tarea); 
-                $('#titulo_tarea_editar').val(titulo)
-                $('#descripcion_tarea_editar').val(descripcion);
-                $('#observaciones_tarea_editar').val(observaciones);
+            if (rowData) {
             
+                self.formTarea.editarTituloTarea = rowData.titulo_tarea || '';
+                self.formTarea.editarDescripcionTarea = rowData.descripcion_tarea || '';
+                self.formTarea.editarObservacionTarea = rowData.observaciones_docente || '';
+
+                // 3. ASIGNAR EL ID AL HIDDEN (usando el nuevo ID único)
+                $('#id_tarea_editar_hidden').val(rowData.id_tarea); 
+
+
+                
+                // 4. Mostrar el modal
                 $('#modal_editar_tareas').modal('show');
+            }
         });
 
         $('#listadoDeTareas tbody').on('click', '.eliminar-tarea', function (e) {
@@ -108,7 +198,7 @@ const appCategorias = createApp({
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.delete(`/eliminar-tarea/${id_tarea}`, {
+                    axios.post(`/eliminar-tarea/${id_tarea}`, {
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         }
@@ -170,10 +260,43 @@ const appCategorias = createApp({
 
         
     },
+    computed: {
+        excedidos() {
+            return {
+                titulo: this.formTarea.tituloTarea.length >= this.limites.tituloTarea,
+                descripcion: this.formTarea.descripcionTarea.length >= this.limites.descripcionTarea,
+                observacion: this.formTarea.observacionTarea.length >= this.limites.observacionTarea,
+                editarTitulo: this.formTarea.editarTituloTarea.length >= this.limites.editarTituloTarea,
+                editarDescripcion: this.formTarea.editarDescripcionTarea.length >= this.limites.editarDescripcionTarea,
+                editarObservacion : this.formTarea.editarObservacionTarea.length >= this.limites.editarObservacionTarea
+            };
+        }
+    },
     methods: {
+            formatarFechaHora(fechaString) {
+                if (!fechaString) return "---";
+                let date = new Date(fechaString);
+                if (isNaN(date.getTime())) return fechaString;
+
+                    return date.toLocaleString('es-ES', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+            },
             asignarTarea() {
                 activarLoadBtn('btn_asignar_tarea');
-    
+
+                const idProyecto = $('#id_proyecto').val();
+
+                if (!idProyecto) {
+                    desactivarLoadBtn('btn_asignar_tarea');
+                    Swal.fire('Atención', 'Debe seleccionar un proyecto para continuar', 'warning');
+                    return; // Detiene la ejecución
+                }
                 // Serializamos el formulario
                 let form = $('#formulario_asignar_tarea').serialize();
 
@@ -196,6 +319,14 @@ const appCategorias = createApp({
                             console.log("Respuesta completa del servidor:", error.response);
                         } else {
                             console.log("Error sin response:", error);
+                        }
+                        if (this.descripcionExcedida) {
+                            Swal.fire({
+                                title: 'Límite excedido',
+                                text: 'La descripción supera el máximo permitido.',
+                                icon: 'warning'
+                            });
+                            return;
                         }
     
                         if (error.response && error.response.status === 422) {
@@ -227,13 +358,13 @@ const appCategorias = createApp({
                 const descripcion_tarea = $('#descripcion_tarea_editar').val();
                 const observaciones_docente = $('#observaciones_tarea_editar').val();
                 // Validaciones básicas (opcional)
-                if (!descripcion_tarea && !observaciones_docente) {
+                if (!titulo_tarea && !descripcion_tarea && !observaciones_docente) {
                     Swal.fire('Error', 'Debe ingresar una descripción o una observación para actualizar.', 'error');
                     return;
                 }       
 
                 // Enviamos la solicitud de actualización con Axios
-                axios.post(`actualizar-tarea/${id_tarea}`, {
+                axios.post(`/actualizar-tarea/${id_tarea}`, {
                     titulo_tarea: titulo_tarea,
                     descripcion_tarea: descripcion_tarea,
                     observaciones_docente: observaciones_docente
@@ -346,11 +477,11 @@ const appCategorias = createApp({
                 }
             });
 
-        },
+            },
+        
         }
     });
     
-    
-    
-    appCategorias.mount('#app_general');
+
+appCategorias.mount('#app_general');
     

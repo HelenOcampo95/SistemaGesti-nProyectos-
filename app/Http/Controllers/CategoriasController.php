@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CaDoResponsable;
 use App\Models\Categorias;
+use App\Models\Usuarios;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -107,4 +109,34 @@ class CategoriasController extends Controller
         }
     }
 
+    public function selectListarDocentesDirector()
+    {
+        // Filtramos los usuarios que tienen el rol exacto
+        $docentes = Usuarios::role('Docente Director')->get();
+
+        return response()->json($docentes, 200);
+    }
+
+    public function selectListarDocentesLider()
+    {
+        // Filtramos los usuarios que tienen el rol exacto
+        $docentes = Usuarios::role('Docente Lider')->get();
+
+        return response()->json($docentes, 200);
+    }
+
+    public function asignarCategoriaDocente(Request $request){
+        try {
+            $responsable                          =  new CaDoResponsable();
+            $responsable->id_categoria            = $request->id_categoria;
+            $responsable->id_docente_director     = $request->id_docente_director;
+            $responsable->id_docente_lider        = $request->id_docente_lider;
+            $responsable->save();
+
+            return response()->json('La categoria se ha creado correctamente', 200);
+        } catch (\Exception $e) {
+            return response()->json('Error al crear la categoria' . $e->getMessage(), 422);
+        }
+    }
+    
 }

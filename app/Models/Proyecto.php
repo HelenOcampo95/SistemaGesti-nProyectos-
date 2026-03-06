@@ -17,6 +17,8 @@ class Proyecto extends Model
 
     const CREATED_AT = 'creado_en';
     const UPDATED_AT = 'actualizado_en';
+    const FINALIZADO = 'Finalizado';
+    const ACTIVO     = 'Activo';
 
     protected $fillable = [
         'id_proyecto',
@@ -28,6 +30,8 @@ class Proyecto extends Model
         'id_usuario',
         'id_categoria',
     ];
+    
+    protected $appends = ['porcentaje_avance'];
 
     public function categoria()
     {
@@ -54,5 +58,22 @@ class Proyecto extends Model
     public function participantes()
     {
         return $this->belongsToMany(Usuarios::class, 'participantes_proyecto', 'id_proyecto', 'id_usuario');
+    }
+    public function versiones()
+    {
+        // 'id_proyecto' es la llave foránea en la tabla versiones
+        return $this->hasMany(Versiones::class, 'id_proyecto', 'id_proyecto');
+    }
+    // Esto hace que el dato se incluya en el JSON para Vue
+
+    public function getPorcentajeAvanceAttribute()
+    {
+        // Si el proyecto no tiene tareas, el avance es 0
+        if ($this->tareas->isEmpty()) {
+            return 0;
+        }
+
+        // Calculamos el promedio de la columna 'porcentaje_avance' de la tabla tareas
+        return round($this->tareas->avg('porcentaje_avance'), 1);
     }
 }

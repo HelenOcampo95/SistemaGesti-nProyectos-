@@ -26,3 +26,4 @@ window.Echo = new Echo({
         }
     }
 });
+

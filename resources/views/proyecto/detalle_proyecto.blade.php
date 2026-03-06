@@ -43,7 +43,7 @@
 											</span>
 											<span class="text-muted fw-bold fs-7">{{$proyecto->categoria->nombre_categoria}}</span>
 										</div>
-										@can('Ver actividades')
+										@can('Ver_actividades')
 											<div class="card-toolbar">
 												<button class="btn btn-icon btn-color-gray-400 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
 													<span class="svg-icon svg-icon-1 svg-icon-gray-300 me-n1">
@@ -58,7 +58,10 @@
 												<div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px" data-kt-menu="true">
 													<div class="separator mb-3 opacity-75"></div>
 														<div class="menu-item px-3">
-															<a href="#" class="menu-link px-3"data-bs-toggle="modal" data-bs-target="#modal_editar_proyecto">Editar Proyecto</a>
+															<a href="#" class="menu-link px-3"data-bs-toggle="modal" data-bs-target="#modal_editar_proyecto" @click="prepararEdicion({{ json_encode($proyecto) }})">Editar Proyecto</a>
+														</div>
+														<div class="menu-item px-3">
+															<a href="#" class="menu-link px-3"data-bs-toggle="modal" data-bs-target="#modal_vincular_estudiante">Vincular estudiante</a>
 														</div>										
 												</div>
 											</div>
@@ -87,10 +90,15 @@
 												<div class="d-flex align-items-center w-200px w-sm-300px flex-column mt-3 p-3">
 													<div class="d-flex justify-content-between w-100 mt-auto mb-2">
 														<span class="fw-semibold fs-6 text-gray-400">Progreso</span>
-														<span class="fw-bold fs-6">50%</span>
+														<span class="fw-semibold fs-6 text-gray-400">{{ $proyecto->porcentaje_avance }}%</span>
+	
 													</div>
 													<div class="h-5px mx-3 w-100 bg-light mb-3">
-														<div class="bg-success rounded h-5px" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+														<div class="bg-success rounded h-5px" 
+															role="progressbar" 
+															style="width: {{ $proyecto->porcentaje_avance }}%;" 
+															aria-valuenow="{{ $proyecto->porcentaje_avance }}">
+														</div>
 													</div>
 												</div>
 											</div>
@@ -190,175 +198,214 @@
 							</div>
 						</div>
 					</div>
-					@can('Ver actividades')
+					@can('Ver_actividades')
 						<div class="col-xl-4 mb-xl-10 align-self-start">
 							<div class="card card-flush">
 								<div class="card-header pt-7">
 									<!--begin::Title-->
 										<h3 class="card-title align-items-start flex-column">
 											<span class="card-label fw-bold text-gray-800">Actividades</span>
-											<span class="text-gray-400 mt-1 fw-semibold fs-6">59 Active Shipments</span>
 										</h3>
-										<div class="card-toolbar">
+										{{-- <div class="card-toolbar">
 											<a href="#" class="btn btn-sm btn-light" data-bs-toggle='tooltip' data-bs-dismiss='click' data-bs-custom-class="tooltip-inverse" title="Logistics App is coming soon">View All</a>
-										</div>
+										</div> --}}
 								</div>
 									<div class="card-body">
 										<ul class="nav nav-pills nav-pills-custom row position-relative mx-0 mb-9">
-											<li class="nav-item col-4 mx-0 p-0">
+											<li class="nav-item col-3 mx-0 p-0">
 												<a class="nav-link active d-flex justify-content-center w-100 border-0 h-100" data-bs-toggle="pill" href="#kt_list_widget_10_tab_1">
-													<span class="nav-text text-gray-800 fw-bold fs-6 mb-3">Pendientes</span>
+													<span class="nav-text text-gray-800 fw-bold fs-6 mb-3">Asignadas</span>
 													<span class="bullet-custom position-absolute z-index-2 bottom-0 w-100 h-4px bg-primary rounded"></span>		
 												</a>
 											</li>
-															<li class="nav-item col-4 mx-0 px-0">
-																<!--begin::Link-->
-																<a class="nav-link d-flex justify-content-center w-100 border-0 h-100" data-bs-toggle="pill" href="#kt_list_widget_10_tab_2">
-																	<!--begin::Subtitle-->
-																	<span class="nav-text text-gray-800 fw-bold fs-6 mb-3">En proceso</span>
-																	<!--end::Subtitle-->
-																	<!--begin::Bullet-->
-																	<span class="bullet-custom position-absolute z-index-2 bottom-0 w-100 h-4px bg-primary rounded"></span>
-																	<!--end::Bullet-->
-																</a>
-																<!--end::Link-->
-															</li>
-															<!--end::Item-->
-															<!--begin::Item-->
-															<li class="nav-item col-4 mx-0 px-0">
-																<!--begin::Link-->
-																<a class="nav-link d-flex justify-content-center w-100 border-0 h-100" data-bs-toggle="pill" href="#kt_list_widget_10_tab_3">
-																	<!--begin::Subtitle-->
-																	<span class="nav-text text-gray-800 fw-bold fs-6 mb-3">Finalizadas</span>
-																	<!--end::Subtitle-->
-																	<!--begin::Bullet-->
-																	<span class="bullet-custom position-absolute z-index-2 bottom-0 w-100 h-4px bg-primary rounded"></span>
-																	<!--end::Bullet-->
-																</a>
-																<!--end::Link-->
-															</li>
-															<!--end::Item-->
-															<!--begin::Bullet-->
-															<span class="position-absolute z-index-1 bottom-0 w-100 h-4px bg-light rounded"></span>
-															<!--end::Bullet-->
+											<li class="nav-item col-3 mx-0 px-0">
+												<!--begin::Link-->
+												<a class="nav-link d-flex justify-content-center w-100 border-0 h-100" data-bs-toggle="pill" href="#kt_list_widget_10_tab_2">
+													<!--begin::Subtitle-->
+													<span class="nav-text text-gray-800 fw-bold fs-6 mb-3">Entregadas</span>
+													<!--end::Subtitle-->
+													<!--begin::Bullet-->
+													<span class="bullet-custom position-absolute z-index-2 bottom-0 w-100 h-4px bg-primary rounded"></span>
+													<!--end::Bullet-->
+												</a>
+												<!--end::Link-->
+											</li>
+											<li class="nav-item col-3 mx-0 px-0">
+												<!--begin::Link-->
+												<a class="nav-link d-flex justify-content-center w-100 border-0 h-100" data-bs-toggle="pill" href="#kt_list_widget_10_tab_3">
+													<!--begin::Subtitle-->
+													<span class="nav-text text-gray-800 fw-bold fs-6 mb-3">Corregir</span>
+													<!--end::Subtitle-->
+													<!--begin::Bullet-->
+													<span class="bullet-custom position-absolute z-index-2 bottom-0 w-100 h-4px bg-primary rounded"></span>
+													<!--end::Bullet-->
+												</a>
+												<!--end::Link-->
+											</li>
+											<li class="nav-item col-3 mx-0 px-0">
+												<!--begin::Link-->
+												<a class="nav-link d-flex justify-content-center w-100 border-0 h-100" data-bs-toggle="pill" href="#kt_list_widget_10_tab_4">
+													<!--begin::Subtitle-->
+													<span class="nav-text text-gray-800 fw-bold fs-6 mb-3">Finalizadas</span>
+													<!--end::Subtitle-->
+													<!--begin::Bullet-->
+													<span class="bullet-custom position-absolute z-index-2 bottom-0 w-100 h-4px bg-primary rounded"></span>
+													<!--end::Bullet-->
+												</a>
+												<!--end::Link-->
+											</li>
+											<!--end::Item-->
+											<!--begin::Bullet-->
+											<span class="position-absolute z-index-1 bottom-0 w-100 h-4px bg-light rounded"></span>
+											<!--end::Bullet-->
 										</ul>
-														<!--end::Nav-->
-														<!--begin::Tab Content-->
-														<div class="tab-content">
-															<!--begin::Tap pane-->
-															<div class="tab-pane fade show active" id="kt_list_widget_10_tab_1">
-																@if($pendientes->count() > 0)
-																	<div class="timeline">
-																		@foreach($pendientes as $tarea)
-																			@php
-																				$fecha = \Carbon\Carbon::parse($tarea->fecha_entrega);
-																				$atrasada = $fecha->isPast() && !$fecha->isToday();
-																				$color = $atrasada ? 'danger' : 'primary';
-																			@endphp
-																			<div class="timeline-item align-items-center mb-7">
-																				<div class="timeline-line w-40px mt-6 mb-n12"></div>
-																				<div class="timeline-icon" style="margin-left: 11px">
-																					<span class="svg-icon svg-icon-2 svg-icon-success">
-																					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-																						<path opacity="0.3" d="M22 12C22 17.5 17.5 22 12 22C6.5 22 2 17.5 2 12C2 6.5 6.5 2 12 2C17.5 2 22 6.5 22 12ZM12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10ZM6.39999 9.89999C6.99999 8.19999 8.40001 6.9 10.1 6.4C10.6 6.2 10.9 5.7 10.7 5.1C10.5 4.6 9.99999 4.3 9.39999 4.5C7.09999 5.3 5.29999 7 4.39999 9.2C4.19999 9.7 4.5 10.3 5 10.5C5.1 10.5 5.19999 10.6 5.39999 10.6C5.89999 10.5 6.19999 10.2 6.39999 9.89999ZM14.8 19.5C17 18.7 18.8 16.9 19.6 14.7C19.8 14.2 19.5 13.6 19 13.4C18.5 13.2 17.9 13.5 17.7 14C17.1 15.7 15.8 17 14.1 17.6C13.6 17.8 13.3 18.4 13.5 18.9C13.6 19.3 14 19.6 14.4 19.6C14.5 19.6 14.6 19.6 14.8 19.5Z" fill="currentColor" />
-																						<path d="M16 12C16 14.2 14.2 16 12 16C9.8 16 8 14.2 8 12C8 9.8 9.8 8 12 8C14.2 8 16 9.8 16 12ZM12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10Z" fill="currentColor" />
-																					</svg>
-																				</span>
-																				</div>
-																				<div class="timeline-content m-0">
-																					<div class="d-flex align-items-center mb-1">
-																						<span class="fs-6 text-gray-800 fw-bold">{{ $tarea->titulo_tarea }}</span>
-																						<span class="badge badge-light-{{ $color }} fs-8 ms-auto px-2 py-1">
-																							{{ $atrasada ? 'Atrasada' : 'Pendiente' }}
-																						</span>
-																					</div>
-																					<span class="fs-7 {{ $atrasada ? 'text-danger' : 'text-gray-400' }} fw-semibold d-block">
-																						{{ $fecha->translatedFormat('d F, Y') }}
-																					</span>
-																					<div class="">
-																						<a href="{{ route('tarea', $tarea->id_tarea) }}" class="text-primary fw-bold text-uppercase" style="font-size: 8px; letter-spacing: 1px;">
-																							Ver Más 
-																						</a>
-																					</div>
-																				</div>
-																			</div>
-																		@endforeach
+											<!--end::Nav-->
+											<!--begin::Tab Content-->
+										<div class="tab-content px-9 hover-scroll-overlay-y pe-7 me-3 mb-2" style="height: 240px">
+											<!--begin::Tap pane-->
+											<div class="tab-pane fade show active" id="kt_list_widget_10_tab_1">
+												@if($asignadas->count() > 0)
+													<div class="timeline">
+														@foreach($asignadas as $tarea)
+															@php
+																$fecha = \Carbon\Carbon::parse($tarea->fecha_entrega);
+																$atrasada = $fecha->isPast() && !$fecha->isToday();
+																$color = $atrasada ? 'danger' : 'primary';
+															@endphp
+															<div class="timeline-item align-items-center mb-7">
+																<div class="timeline-line w-40px mt-6 mb-n12"></div>
+																<div class="timeline-icon" style="margin-left: 11px">
+																	<span class="svg-icon svg-icon-2 svg-icon-success">
+																		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+																			<path opacity="0.3" d="M22 12C22 17.5 17.5 22 12 22C6.5 22 2 17.5 2 12C2 6.5 6.5 2 12 2C17.5 2 22 6.5 22 12ZM12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10ZM6.39999 9.89999C6.99999 8.19999 8.40001 6.9 10.1 6.4C10.6 6.2 10.9 5.7 10.7 5.1C10.5 4.6 9.99999 4.3 9.39999 4.5C7.09999 5.3 5.29999 7 4.39999 9.2C4.19999 9.7 4.5 10.3 5 10.5C5.1 10.5 5.19999 10.6 5.39999 10.6C5.89999 10.5 6.19999 10.2 6.39999 9.89999ZM14.8 19.5C17 18.7 18.8 16.9 19.6 14.7C19.8 14.2 19.5 13.6 19 13.4C18.5 13.2 17.9 13.5 17.7 14C17.1 15.7 15.8 17 14.1 17.6C13.6 17.8 13.3 18.4 13.5 18.9C13.6 19.3 14 19.6 14.4 19.6C14.5 19.6 14.6 19.6 14.8 19.5Z" fill="currentColor" />
+																			<path d="M16 12C16 14.2 14.2 16 12 16C9.8 16 8 14.2 8 12C8 9.8 9.8 8 12 8C14.2 8 16 9.8 16 12ZM12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10Z" fill="currentColor" />
+																		</svg>
+																	</span>
+																</div>
+																<div class="timeline-content m-0">
+																	<div class="d-flex align-items-center mb-1">
+																		<span class="fs-6 text-gray-800 fw-bold">{{ $tarea->titulo_tarea }}</span>
+																		<span class="badge badge-light-{{ $color }} fs-8 ms-auto px-2 py-1">
+																			{{ $atrasada ? 'Atrasada' : 'Asignada' }}
+																		</span>
 																	</div>
-																@else
-																	<p class="text-gray-400 text-center py-5">No hay tareas pendientes.</p>
-																@endif
-															</div>
-															<div class="tab-pane fade" id="kt_list_widget_10_tab_2">
-																@if($enDesarrollo->count() > 0)
-																		<div class="timeline">
-																			@foreach($enDesarrollo as $tarea)
-																				@php
-																					$fecha = \Carbon\Carbon::parse($tarea->fecha_entrega);
-																					$atrasada = $fecha->isPast() && !$fecha->isToday();
-																					$color = $atrasada ? 'danger' : 'warning';
-																				@endphp
-																				<div class="timeline-item align-items-center mb-7">
-																					<div class="timeline-line w-40px mt-6 mb-n12"></div>
-																					<div class="timeline-icon" style="margin-left: 11px">
-																						<span class="svg-icon svg-icon-2 svg-icon-{{ $color }}">
-																							<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.3"/><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>
-																						</span>
-																					</div>
-																					<div class="timeline-content m-0">
-																						<div class="d-flex align-items-center mb-1">
-																							<span class="fs-6 text-gray-800 fw-bold">{{ $tarea->titulo_tarea }}</span>
-																							<span class="badge badge-light-{{ $color }} fs-8 ms-auto px-2 py-1">
-																								{{ $atrasada ? 'Atrasada' : 'en proceso' }}
-																							</span>
-																						</div>
-																						<span class="fs-7 {{ $atrasada ? 'text-danger' : 'text-gray-400' }} fw-semibold d-block">
-																							{{ $fecha->translatedFormat('d F, Y') }}
-																						</span>
-																						<div class="">
-																							<a href="{{ route('tarea', $tarea->id_tarea) }}" class="text-primary fw-bold text-uppercase" style="font-size: 8px; letter-spacing: 1px;">
-																								Ver Más 
-																							</a>
-																						</div>
-																					</div>
-																				</div>
-																			@endforeach
-																		</div>
-																	@else
-																		<p class="text-gray-400 text-center py-5">No hay tareas en proceso.</p>
-																	@endif
-															</div>
-															<div class="tab-pane fade" id="kt_list_widget_10_tab_3">
-																@if($finalizadas->count() > 0)
-																	<div class="timeline">
-																		@foreach($finalizadas as $tarea)
-																			<div class="timeline-item align-items-center mb-7">
-																				<div class="timeline-line w-40px mt-6 mb-n12"></div>
-																				<div class="timeline-icon" style="margin-left: 11px">
-																					<span class="svg-icon svg-icon-2 svg-icon-success">
-																						<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M10.58 13.41l-2.41-2.41L7.05 12.12L10.58 15.65L17.65 8.58L16.53 7.46L10.58 13.41Z" fill="currentColor"/></svg>
-																					</span>
-																				</div>
-																				<div class="timeline-content m-0">
-																					<div class="d-flex align-items-center mb-1">
-																						<span class="fs-6 text-gray-800 fw-bold">{{ $tarea->titulo_tarea }}</span>
-																						<span class="badge badge-light-success fs-8 ms-auto px-2 py-1">Finalizada</span>
-																					</div>
-																					<span class="fs-7 text-gray-400 fw-semibold d-block">Completada</span>
-																					<div class="">
-																						<a href="{{ route('tarea', $tarea->id_tarea) }}" class="text-primary fw-bold text-uppercase" style="font-size: 8px; letter-spacing: 1px;">
-																							Ver Más 
-																						</a>
-																					</div>
-																				</div>
-																			</div>
-																		@endforeach
+																	<span class="fs-7 {{ $atrasada ? 'text-danger' : 'text-gray-400' }} fw-semibold d-block">
+																		{{ $fecha->translatedFormat('d F, Y') }}
+																	</span>
+																	<div class="">
+																		<a href="{{ route('tarea', $tarea->id_tarea) }}" class="text-primary fw-bold text-uppercase" style="font-size: 8px; letter-spacing: 1px;">
+																			Ver Más 
+																		</a>
 																	</div>
-																@else
-																	<p class="text-gray-400 text-center py-5">No hay tareas finalizadas.</p>
-																@endif
+																</div>
 															</div>
-														</div>
-														<!--end::Tab Content-->
+														@endforeach
+													</div>
+												@else
+													<p class="text-gray-400 text-center py-5">No hay tareas asignadas.</p>
+												@endif
+											</div>
+											<div class="tab-pane fade" id="kt_list_widget_10_tab_2">
+												@if($entregadas->count() > 0)
+													<div class="timeline">
+														@foreach($entregadas as $tarea)
+															@php
+																$fecha = \Carbon\Carbon::parse($tarea->fecha_entrega);
+																$atrasada = $fecha->isPast() && !$fecha->isToday();
+																$color = $atrasada ? 'danger' : 'warning';
+															@endphp
+															<div class="timeline-item align-items-center mb-7">
+																<div class="timeline-line w-40px mt-6 mb-n12"></div>
+																<div class="timeline-icon" style="margin-left: 11px">
+																	<span class="svg-icon svg-icon-2 svg-icon-{{ $color }}">
+																		<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.3"/><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>
+																	</span>
+																</div>
+																<div class="timeline-content m-0">
+																	<div class="d-flex align-items-center mb-1">
+																		<span class="fs-6 text-gray-800 fw-bold">{{ $tarea->titulo_tarea }}</span>
+																		<span class="badge badge-light-{{ $color }} fs-8 ms-auto px-2 py-1">
+																			{{ $atrasada ? 'Atrasada' : 'Entregada' }}
+																		</span>
+																	</div>
+																	<span class="fs-7 {{ $atrasada ? 'text-danger' : 'text-gray-400' }} fw-semibold d-block">
+																		{{ $fecha->translatedFormat('d F, Y') }}
+																	</span>
+																	<div class="">
+																		<a href="{{ route('tarea', $tarea->id_tarea) }}" class="text-primary fw-bold text-uppercase" style="font-size: 8px; letter-spacing: 1px;">
+																			Ver Más 
+																		</a>
+																	</div>
+																</div>
+															</div>
+														@endforeach
+													</div>
+												@else
+													<p class="text-gray-400 text-center py-5">No hay tareas entregadas.</p>
+												@endif
+											</div>
+											<div class="tab-pane fade" id="kt_list_widget_10_tab_3">
+												@if($corregir->count() > 0)
+													<div class="timeline">
+														@foreach($corregir as $tarea)
+															<div class="timeline-item align-items-center mb-7">
+																<div class="timeline-line w-40px mt-6 mb-n12"></div>
+																<div class="timeline-icon" style="margin-left: 11px">
+																	<span class="svg-icon svg-icon-2 svg-icon-success">
+																		<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M10.58 13.41l-2.41-2.41L7.05 12.12L10.58 15.65L17.65 8.58L16.53 7.46L10.58 13.41Z" fill="currentColor"/></svg>
+																	</span>
+																</div>
+																<div class="timeline-content m-0">
+																	<div class="d-flex align-items-center mb-1">
+																		<span class="fs-6 text-gray-800 fw-bold">{{ $tarea->titulo_tarea }}</span>
+																		<span class="badge badge-light-success fs-8 ms-auto px-2 py-1">Corregir</span>
+																	</div>
+																	<span class="fs-7 text-gray-400 fw-semibold d-block">Completada</span>
+																	<div class="">
+																		<a href="{{ route('tarea', $tarea->id_tarea) }}" class="text-primary fw-bold text-uppercase" style="font-size: 8px; letter-spacing: 1px;">
+																			Ver Más 
+																		</a>
+																	</div>
+																</div>
+															</div>
+														@endforeach
+													</div>
+												@else
+													<p class="text-gray-400 text-center py-5">No hay tareas por corregir.</p>
+												@endif
+											</div>
+											<div class="tab-pane fade" id="kt_list_widget_10_tab_4">
+												@if($finalizadas->count() > 0)
+													<div class="timeline">
+														@foreach($finalizadas as $tarea)
+															<div class="timeline-item align-items-center mb-7">
+																<div class="timeline-line w-40px mt-6 mb-n12"></div>
+																<div class="timeline-icon" style="margin-left: 11px">
+																	<span class="svg-icon svg-icon-2 svg-icon-success">
+																		<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M10.58 13.41l-2.41-2.41L7.05 12.12L10.58 15.65L17.65 8.58L16.53 7.46L10.58 13.41Z" fill="currentColor"/></svg>
+																	</span>
+																</div>
+																<div class="timeline-content m-0">
+																	<div class="d-flex align-items-center mb-1">
+																		<span class="fs-6 text-gray-800 fw-bold">{{ $tarea->titulo_tarea }}</span>
+																		<span class="badge badge-light-success fs-8 ms-auto px-2 py-1">Finalizada</span>
+																	</div>
+																	<span class="fs-7 text-gray-400 fw-semibold d-block">Completada</span>
+																	<div class="">
+																		<a href="{{ route('tarea', $tarea->id_tarea) }}" class="text-primary fw-bold text-uppercase" style="font-size: 8px; letter-spacing: 1px;">
+																			Ver Más 
+																		</a>
+																	</div>
+																</div>
+															</div>
+														@endforeach
+													</div>
+												@else
+													<p class="text-gray-400 text-center py-5">No hay tareas finalizadas.</p>
+												@endif
+											</div>
+										</div>
+										<!--end::Tab Content-->
 									</div>
 								<!--end: Card Body-->
 							</div>
@@ -392,28 +439,54 @@
 									<div class="scroll-y me-n7 pe-7" id="kt_modal_add_customer_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_customer_header" data-kt-scroll-wrappers="#kt_modal_add_customer_scroll" data-kt-scroll-offset="300px">
 										<div class="mb-5 fv-row mb-7">
 											<label class="fs-6 fw-semibold mb-2 required">Nombre del proyecto</label>
-											<input type="text" class="form-control form-control-solid" placeholder="" name="nombre_proyecto" id="nombre_proyecto" value="{{ $proyecto->nombre_proyecto}}"/>
-										</div>
-										<div class="mb-5 fv-row">
-											<label for="" class="form-label">Descripción del proyecto</label>
-											<textarea class="form-control form-control-solid form-control-sm" placeholder="" name="descripcion_proyecto" id="descripcion_proyecto" value="{{ $proyecto->descripcion_proyecto}}" rows="4"></textarea>
-										</div>
-										<div class="mb-5 fv-row">
-											<label class="fs-6 fw-semibold mb-2 required" >Fecha inicio</label>
-                                            <input type="text" class="form-control form-control-solid" id="fecha_inicio" placeholder="" name="fecha_inicio" value="{{ $proyecto->fecha_inicio}}" />
-										</div>
-										<div class="mb-5 fv-row">
-											<label class="fs-6 fw-semibold mb-2 required" >Fecha entrega</label>
-                                            <input type="text" class="form-control form-control-solid" id="fecha_entrega" placeholder="" name="fecha_entrega" value="{{ $proyecto->fecha_entrega}}" />
-										</div>
-										<div class="mb-5 fv-row mb-7">
-											<label class="fs-6 fw-semibold mb-2 required">Estado</label>
-											<input type="text" class="form-control form-control-solid" placeholder="" name="estado_proyecto" id="estado_proyecto" value="{{ $proyecto->estado_proyecto}}" disabled/>
-										</div>
-										<div class="mb-5 fv-row mb-7">
-											<label class="fs-6 fw-semibold mb-2 required">Categoría</label>
 											<input type="text" class="form-control form-control-solid" 
-											value="{{ $proyecto->categoria->nombre_categoria }}" readonly>
+												placeholder="" 
+												name="nombre_proyecto" 
+												id="nombre_proyecto" 
+												v-model="formProyecto.nombre_proyecto"
+												/>
+										</div>
+										<div class="mb-5 fv-row">
+											<label for="" class="form-label required">Descripción del proyecto</label>
+											<textarea class="form-control form-control-solid form-control-sm" 
+												placeholder="" 
+												name="descripcion_proyecto" 
+												id="descripcion_proyecto" 
+												v-model="formProyecto.descripcion_proyecto" 
+												rows="4">
+											</textarea>
+										</div>
+										<div class="row g-9 mb-8">
+											<div class="col-md-6 fv-row">
+												<label class="fs-6 fw-semibold mb-2 required" >Fecha inicio</label>
+												<input type="text" class="form-control form-control-solid" 
+												id="fecha_inicio" 
+												name="fecha_inicio" 
+												v-model="formProyecto.fecha_inicio"
+												disabled />
+											</div>
+											<div class="col-md-6 fv-row">
+												<label class="fs-6 fw-semibold mb-2 required" >Fecha entrega</label>
+												<input type="text"
+												class="form-control form-control-solid" 
+												id="fecha_entrega" 
+												name="fecha_entrega" 
+												v-model="formProyecto.fecha_entrega" 
+												disabled/>
+											</div>
+										</div>
+										<div class="mb-5 fv-row mb-7">
+											<label class="fs-6 fw-semibold mb-2">Estado</label>
+											<input type="text" 
+											class="form-control form-control-solid" 
+											name="estado_proyecto" 
+											id="estado_proyecto" 
+											v-model="formProyecto.estado_proyecto" disabled/>
+										</div>
+										<div class="mb-5 fv-row mb-7">
+											<label class="fs-6 fw-semibold mb-2 ">Categoría</label>
+											<input type="text" class="form-control form-control-solid" 
+											v-model="formProyecto.nombre_categoria" disabled>
 
 												<!-- Enviar el id al backend -->
 											<input type="hidden" name="id_categoria" value="{{ $proyecto->id_categoria }}">
@@ -423,6 +496,54 @@
 									<div class="modal-footer flex-center">
 										<button type="button" id="btn_editar_proyecto" class="btn btn-success" @click.prevent="actualizarProyecto(proyecto)">
 											<span class="indicator-label">Editar proyecto</span>
+											<span class="indicator-progress">Por favor espere...
+											<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+										</button>
+									</div>
+									<!-- ./ Footer modal materias primas -->
+			</form>
+			<!--end::Form-->
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="modal_vincular_estudiante" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+	<div class="modal-dialog modal-dialog-centered mw-650px">
+		<div class="modal-content" id="vincular_estudiante">
+			<form class="form" id="formulario_vincular_estudiante">
+				<!-- Encabezado modal materias primas -->
+							<div class="modal-header" id="kt_modal_add_customer_header">
+								<h2 class="fw-bold">Vincular estudiante</h2>
+									<div id="kt_modal_add_customer_close" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal" aria-label="Close">
+										<span class="svg-icon svg-icon-1">
+											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+												<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+											</svg>
+										</span>
+									</div>
+							</div>					
+							<div class="modal-body py-10 px-lg-17">
+									<div class="scroll-y me-n7 pe-7" id="kt_modal_add_customer_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_customer_header" data-kt-scroll-wrappers="#kt_modal_add_customer_scroll" data-kt-scroll-offset="300px">
+										<div class="mb-3">
+										<label class="fs-6 fw-semibold mb-2 required">Estudiantes participantes</label>
+										<div class="border p-2 rounded d-flex flex-wrap align-items-center" style="min-height: 45px; background-color: #f5f8fa;">
+											<div v-for="(correo, index) in colaboradores" :key="index" class="badge badge-secondary m-1 p-2 d-flex align-items-center">
+											@{{ correo }}
+											<span @click="eliminarColaborador(index)" class="ms-2 cursor-pointer text-danger">&times;</span>
+											</div>
+											<input type="email" v-model="nuevo_correo"  @keydown.enter.prevent="agregarColaborador" 
+											class="border-0 bg-transparent flex-grow-1" 
+											placeholder="Escribe un correo y pulsa Enter"
+											style="outline: none;">
+										</div>
+											<small class="text-muted">Los usuarios que no existan serán invitados automáticamente.</small>
+										</div>
+										<input type="hidden" name="correo_usuario" id="correo_usuarios_hidden">
+									</div>
+							</div>
+									<div class="modal-footer flex-center">
+										<button type="button" id="btn_vincular_estudiante" class="btn btn-success" @click.prevent="vincularEstudiante(proyecto)">
+											<span class="indicator-label">Registrar estudiante</span>
 											<span class="indicator-progress">Por favor espere...
 											<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
 										</button>

@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta property="og:locale" content="es_ES" />
-
+    <meta name="user-id" content="{{ auth()->check() ? auth()->id() : '' }}">
     <link rel="apple-touch-icon" sizes="57x57" href="{{ asset('images/iconos/apple-icon-57x57.png') }}">
     <link rel="apple-touch-icon" sizes="60x60" href="{{ asset('images/iconos/apple-icon-60x60.png') }}">
     <link rel="apple-touch-icon" sizes="72x72" href="{{ asset('images/iconos/apple-icon-72x72.png') }}">
@@ -92,40 +92,110 @@
                 </div>
                 <div class="d-flex align-items-stretch justify-content-end flex-lg-grow-1" id="kt_app_header_wrapper">
                     <div class="app-navbar flex-shrink-0">
-                        <div class="app-navbar-item ms-1 ms-lg-3">
-                        </div>
-                        <div class="app-navbar-item ms-1 ms-lg-3" id="kt_header_user_menu_toggle">
-                            <!--begin::Menu wrapper-->
-                            <div class="cursor-pointer symbol symbol-75px symbol-md-75px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
-                                <div class="menu-content d-flex align-items-center px-3">
-                                        <div class="d-flex flex-column me-5">
-                                            <div class="fw-bold d-flex align-items-center fs-5">{{ auth()->user()->nombre_usuario }} {{ auth()->user()->apellido_usuario }} 
+                        
+                        <div class="app-navbar flex-shrink-0">
+                            <div class="app-navbar-item ms-1 ms-lg-3">
+                                <div class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px w-md-40px h-md-40px position-relative" 
+                                    data-kt-menu-trigger="{default: 'click', lg: 'hover'}" 
+                                    data-kt-menu-attach="parent" 
+                                    data-kt-menu-placement="bottom-end">
+                                    
+                                    <span class="svg-icon svg-icon-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                            <path opacity="0.3" d="M12 22C13.6569 22 15 20.6569 15 19H9C9 20.6569 10.3431 22 12 22Z" fill="currentColor"></path>
+                                            <path d="M19 15V9C19 5.27238 16.3915 2.20261 12.9655 1.74259C12.977 1.49981 12.9999 1.25275 12.9999 1C12.9999 0.447715 12.5522 0 11.9999 0C11.4476 0 10.9999 0.447715 10.9999 1C10.9999 1.25275 11.0229 1.49981 11.0344 1.74259C7.60833 2.20261 4.99994 5.27238 4.99994 9V15L3 17V18H21V17L19 15Z" fill="currentColor"></path>
+                                        </svg>
+                                    </span>
+
+                                    @php
+                                        $conteoNoLeidas = \App\Models\Notificacion::where('id_usuario', auth()->id())
+                                                ->where('leida', 0)
+                                                ->count();
+                                    @endphp
+                                    <span id="punto-rojo" 
+                                        class="badge badge-circle badge-danger w-15px h-15px position-absolute top-0 start-50 mt-n1 ms-n1 {{ $conteoNoLeidas > 0 ? '' : 'd-none' }}">
+                                        {{ $conteoNoLeidas }}
+                                    </span>
+                                </div>
+
+                                <div class="menu menu-sub menu-sub-dropdown menu-column w-350px w-lg-375px" data-kt-menu="true">
+                                    <div class="d-flex flex-column bgi-no-repeat rounded-top px-4 py-6">
+                                        <h3 class="text-gray-800 fw-bold">Notificaciones</h3>
+                                        <span class="text-gray-800 opacity-80 fs-8">Tienes <span id="texto-conteo-no-leidas" class="fw-bold">{{ $conteoNoLeidas }}</span> pendientes</span>
+                                    </div>
+
+                                    <div class="scroll-y mh-325px my-2 px-8" id="contenedor-notificaciones">
+                                        @php
+                                            $notificaciones = \App\Models\Notificacion::where('id_usuario', auth()->id())
+                                                ->orderBy('actualizado_en', 'desc')
+                                                ->take(15)->get();
+                                        @endphp
+                                        <div class="separator mb-1 opacity-75"></div>
+                                        @forelse($notificaciones as $notif)
+                                            <div class="d-flex flex-stack p-3 m-2 border-bottom border-gray-200 {{ $notif->leida == 0 ? 'bg-light-success' : 'bg-white' }}" style="border-radius: 20px;">
+                                                <div class="d-flex align-items-center me-2">
+                                                    <div class="mb-0">
+                                                        <div class="fs-6 text-gray-800 fw-bold"> 
+                                                            {{ $notif->titulo_notificacion }}
+                                                        </div>
+                                                        <div class="text-gray-400 fs-7">{{ $notif->descripcion_notificacion }}</div>
+                                                        <div class="text-gray-400 fs-7">
+                                                            <a href="{{ $notif->url_notificacion }}" 
+                                                                class="fs-8 text-success text-hover-success" 
+                                                                onclick="marcarLeida(event, {{ $notif->id_notificacion }}, '{{ $notif->url_notificacion }}')">
+                                                                    Ver Más
+                                                            </a>
+                                                        </div>
+                                                        <span class="text-gray-500 fs-9">{{ $notif->actualizado_en->diffForHumans() }}</span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="symbol symbol-40px symbol-circle me-5">
+                                        @empty
+                                            <div id="notificacion-vacia" class="text-center py-10">
+                                                <div class="text-gray-400 fs-7">No tienes notificaciones por ahora.</div>
+                                            </div>
+                                        @endforelse
+                                    </div>
+
+                                    <div class="py-3 text-center border-top">
+                                        <a href="#" class="btn btn-color-gray-600 btn-active-color-primary">Ver Todo</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="app-navbar-item ms-1 ms-lg-3" id="kt_header_user_menu_toggle">
+                                <div class="cursor-pointer symbol symbol-40px" 
+                                    data-kt-menu-trigger="{default: 'click', lg: 'hover'}" 
+                                    data-kt-menu-attach="parent" 
+                                    data-kt-menu-placement="bottom-end">
+                                    <img alt="Logo" src="{{ asset('assets/media/avatars/blank.png') }}" />
+                                </div>
+
+                                <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-color fw-semibold py-4 fs-6 w-275px" data-kt-menu="true">
+                                    <div class="my-2 px-5 d-flex align-items-center">
+                                        <div class="symbol symbol-50px me-5">
                                             <img alt="Logo" src="{{ asset('assets/media/avatars/blank.png') }}" />
                                         </div>
-                                        <!--end::Username-->
+                                        <div class="d-flex flex-column">
+                                            <div class="fw-bold d-flex align-items-center fs-5">
+                                                {{ auth()->user()->nombre_usuario }}
+                                            </div>
+                                            <span class="text-muted fw-bold fs-7">{{ auth()->user()->getRoleNames()->first() }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="separator my-2"></div>
+                                    <div class="menu-item px-5">
+                                        <form action="/logout" method="POST">
+                                            @csrf
+                                            <a href="#" class="menu-link px-5" onclick="this.closest('form').submit()">
+                                                <i class="fa-solid fa-right-from-bracket me-3"></i> Cerrar sesión
+                                            </a>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                            <!--begin::User account menu-->
-                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-color fw-semibold py-4 fs-6 w-275px" data-kt-menu="true">
-                                <!--begin::Menu separator-->
-                                <div class="separator my-2 d-none"></div>
-                                <div class="separator my-2"></div>
-                                <div class="menu-item px-5">
-                                    <form action="/logout" method="POST">
-                                        @csrf
-                                        <a href="#" class="menu-link px-5" onclick="this.closest('form').submit()"><i class="fa-solid fa-right-from-bracket me-3"></i> Cerrar sesión</a>
-                                    </form>
-                                </div>
-                            </div>
-                            <!--end::User account menu-->
-                            <!--end::Menu wrapper-->
                         </div>
-                        <!--end::User menu-->
                     </div>
-                    <!--end::Navbar-->
                 </div>
             </div>
             <!--end::Header container-->
@@ -178,7 +248,7 @@
                                         </a>
                                 </div>
                                 @endrole
-                                @role(['Docente Lider', 'Docente Director'])
+                                @role(['Docente Lider', 'Docente Director', 'Administrador'])
                                 <div class="menu-item">
                                         <a class="menu-link" href="{{ route('listarProyectos') }}">
                                             <span class="menu-icon">
@@ -188,7 +258,7 @@
                                         </a>
                                 </div>
                                 @endrole
-                                @role('Docente Lider')
+                                @role(['Docente Lider', 'Administrador'])
                                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
                                         <div class="menu-item">
                                         <a class="menu-link" href="{{ route('categorias') }}">
@@ -200,7 +270,7 @@
                                         </div>
                                     </div>
                                 @endrole
-                                @role(['Docente Lider', 'Administrador'])
+                                @role(['Docente Lider', 'Docente Director', 'Administrador'])
                                     <div class="menu-item">
                                         <a class="menu-link" href="{{ route('tareas') }}">
                                             <span class="menu-icon">
@@ -210,7 +280,7 @@
                                         </a>
                                     </div>
                                 @endrole
-                                @can('Registrar usuarios')
+                                @role(['Administrador'])
                                     <div class="menu-item">
                                         <a class="menu-link" href="{{ route('tareas') }}">
                                             <span class="menu-icon">
@@ -219,7 +289,7 @@
                                             <span class="menu-title">Registrarme</span>
                                         </a>
                                     </div>  
-                                @endcan
+                                @endrole
                         </div>
                     </div>
                 </div>
@@ -229,7 +299,7 @@
             <div id="app_general">
 
                 <!-- Contenido principal de la página -->
-                <div class="app-main flex-column flex-row-fluid pt-15" id="kt_app_main">
+                <div class="app-main flex-column flex-row-fluid pt-0" id="kt_app_main">
                     <!--begin::Content wrapper-->
                     <div class="d-flex flex-column flex-column-fluid space-inicial">
 
@@ -288,6 +358,43 @@
 <script src="{{ asset('assets/js/custom/widgets.js') }}"></script>
 
 @yield('scripts')
+@vite(['resources/js/app.js'])
+<script>
+function marcarLeida(event, id, url) {
+    // Evita que el enlace abra la URL antes de marcar como leída
+    event.preventDefault();
 
+    fetch(`/notificaciones/leer/${id}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        // Una vez actualizado en BD, redirigimos a la URL del "Ver más"
+        window.location.href = url;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // En caso de error, redirigimos de todos modos para no bloquear al usuario
+        window.location.href = url;
+    });
+}
+function actualizarContadorNotificaciones() {
+    // Supongamos que tu contador tiene el id "contador-notificaciones"
+    const contador = document.getElementById('punto-rojo');
+    
+    if (contador) {
+        let valorActual = parseInt(contador.innerText) || 0;
+        contador.innerText = valorActual + 1;
+        
+        // Efecto visual opcional: que brille o salte al cambiar
+        contador.classList.add('badge-animacion');
+        setTimeout(() => contador.classList.remove('badge-animacion'), 500);
+    }
+}
+</script>
 </body>
 </html>

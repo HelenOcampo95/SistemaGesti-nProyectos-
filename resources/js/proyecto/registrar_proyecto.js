@@ -8,6 +8,16 @@ const appProyectos = createApp({
             tabla: null,
             colaboradores: [],
             nuevo_correo: '',
+            formProyecto: {
+                nombreProyecto: '',
+                descripcionProyecto: '',
+
+            },
+            limites: {
+                nombreProyecto: 45,
+                descripcionProyecto: 200,
+
+            }
         }
     },
     mounted(){
@@ -182,6 +192,14 @@ const appProyectos = createApp({
             });
         });
     },
+    computed: {
+        excedidos(){
+            return {
+                nombre: this.formProyecto.nombreProyecto.length >= this.limites.nombreProyecto,
+                descripcion: this.formProyecto.descripcionProyecto.length >= this.limites.descripcionProyecto,
+            }
+        }
+    },
     methods: {
         inicializarDatePicker( elemento, minDateToday = false) {
 
@@ -194,6 +212,7 @@ const appProyectos = createApp({
                 $( elemento ).daterangepicker({
                     singleDatePicker: true,
                     // showDropdowns: true,
+                    autoUpdateInput: false,
                     minYear: 1901,
                     maxYear: parseInt(moment().format("YYYY"),12),
                     minDate: today,
@@ -240,6 +259,7 @@ const appProyectos = createApp({
             $( elemento ).daterangepicker({
                 singleDatePicker: true,
                 // showDropdowns: true,
+                autoUpdateInput: false,
                 minYear: 1901,
                 maxYear: parseInt(moment().format("YYYY"),12),
                 locale: {
@@ -313,7 +333,24 @@ const appProyectos = createApp({
                 id_categoria: $('#id_categoria').val(),
                 colaboradores: this.colaboradores // <--- Array de Vue
             };
+            
+            if (!datos.fecha_inicio || !datos.fecha_entrega) {
+                desactivarLoadBtn('btn_crear_proyecto');
+                Swal.fire('Atención', 'Debe completar las fechas', 'warning');
+                return;
+            }
 
+            if (datos.fecha_entrega < datos.fecha_inicio) {
+                desactivarLoadBtn('btn_crear_proyecto');
+                Swal.fire('Error en fechas', 'La fecha de entrega no puede ser anterior a la fecha de inicio', 'error');
+                return;
+            }
+            if (!datos.id_categoria) {
+                    desactivarLoadBtn('btn_crear_proyecto');
+                    Swal.fire('Atención', 'Debe seleccionar una categoria para continuar', 'warning');
+                    return; // Detiene la ejecución
+            }
+            
             axios.post('/proyectos', datos)
                 .then(response => {
                     Swal.fire('¡Éxito!', 'Proyecto y colaboradores registrados', 'success')

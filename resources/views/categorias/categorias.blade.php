@@ -112,13 +112,36 @@
                         <label class="fs-6 fw-semibold mb-2 required">Nombre de la categoria</label>
                         <input type="text" class="form-control form-control-solid" 
                             id="nombre_categoria_registrar" 
-                            name="nombre_categoria" />
+                            name="nombre_categoria" 
+                            v-model="formCategoria.nombreCategoria"
+                            :class="{'border-danger': excedidos.nombre}"
+                            :maxlength="limites.nombreCategoria"/>
+                        <div class="d-flex justify-content-between mt-2">
+                            <small v-if="excedidos.nombre" class="text-danger">
+                                Límite máximo alcanzado.
+                            </small>
+                        </div>
                     </div>
                     <div class="mb-5 fv-row">
                         <label class="form-label">Descripción de la categoria</label>
                         <textarea class="form-control form-control-solid form-control-sm"
-                                name="descripcion_categoria"
-                                id="descripcion_categoria_registrar" rows="4"></textarea>
+                            name="descripcion_categoria"
+                            id="descripcion_categoria_registrar" 
+                            rows="4"
+                            v-model="formCategoria.descripcionCategoria"
+							:class="{ 'border-danger': excedidos.descripcion }"
+							:maxlength="limites.descripcionCategoria"
+						></textarea>
+
+						<div class="d-flex justify-content-between mt-2">
+							<small 
+								:class="excedidos.descripcion ? 'text-danger' : 'text-muted'"
+								v-text="formCategoria.descripcionCategoria.length + ' / ' + limites.descripcionCategoria + ' caracteres'">
+							</small>
+							<small v-if="excedidos.descripcion" class="text-danger">
+								Límite máximo alcanzado
+							</small>
+						</div>
                     </div>
                 </div>
                 <div class="modal-footer flex-center">
@@ -148,25 +171,19 @@
                 <div class="modal-body py-10 px-lg-17">
                     <div class="mb-5 fv-row">
                         <label class="fs-6 fw-semibold mb-2 required">Nombre de la Facultad</label>
-                        <input type="text" class="form-control form-control-solid" 
-                            id="nombre_categoria_registrar" 
-                            name="nombre_categoria" />
+                        <select  class="form-select form-select-solid" data-placeholder="Seleccione una categoria" name="id_categoria" id="id_categoria" required></select>
                     </div>
                     <div class="mb-5 fv-row">
-                        <label class="form-label">Docente Director</label>
-						<input type="text" class="form-control form-control-solid" 
-                            id="nombre_categoria_registrar" 
-                            name="nombre_categoria" />
+                        <label class="form-label required">Docente Director</label>
+						<select  class="form-select form-select-solid" data-placeholder="Seleccione un docente" name="id_docente_director" id="id_docente_director" required></select>
                     </div>
 					<div class="mb-5 fv-row">
-                        <label class="form-label">Docente Lider</label>
-						<input type="text" class="form-control form-control-solid" 
-                            id="nombre_categoria_registrar" 
-                            name="nombre_categoria" />
+                        <label class="form-label required">Docente Lider</label>
+						<select  class="form-select form-select-solid" data-placeholder="Seleccione un docente" name="id_docente_lider" id="id_docente_lider" required></select>
                     </div>
                 </div>
                 <div class="modal-footer flex-center">
-                    <button type="button" id="btn_registrar_categoria" class="btn btn-success" @click.prevent="registrarCategoria">
+                    <button type="button" id="btn_asignar_docente" class="btn btn-success" @click.prevent="asignarCategoriaDocente">
                         <span class="indicator-label">Registrar docente</span>
                         <span class="indicator-progress">Por favor espere...
                             <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
@@ -196,13 +213,35 @@
                         <label class="fs-6 fw-semibold mb-2 required">Nombre de la categoria</label>
                         <input type="text" class="form-control form-control-solid" 
                             id="nombre_categoria_editar" 
-                            name="nombre_categoria"/>
+                            name="nombre_categoria"
+                            v-model="formCategoria.editarCategoria"
+                            :class="{'border-danger': excedidos.editarNombreCategoria}"
+                            :maxlength="limites.editarCategoria">
+                            <div class="d-flex justify-content-between mt-2">
+                                <small v-if="excedidos.editarNombreCategoria" class="text-danger">
+                                    Límite máximo alcanzado.
+                                </small>
+                            </div>
                     </div>
                     <div class="mb-5 fv-row">
                         <label class="form-label">Descripción de la categoria</label>
                         <textarea class="form-control form-control-solid form-control-sm"
-                                name="descripcion_categoria"
-                                id="descripcion_categoria_editar" rows="4"></textarea>
+                            name="descripcion_categoria_editar"
+                            id="descripcion_categoria_editar" 
+                            rows="4"
+                            v-model="formCategoria.editarDescripcion"
+                            :class="{ 'border-danger': excedidos.editarDescripcionCategoria}"
+                            :maxlength="limites.editarDescripcion">
+                        </textarea>
+                        <div class="d-flex justify-content-between mt-4">
+                            <small 
+                                :class="excedidos.editarDescripcionCategoria ? 'text-danger' : 'text-muted'"
+                                v-text="formCategoria.editarDescripcion.length + ' / ' + limites.editarDescripcion + ' caracteres '">
+                            </small>
+                            <small v-if="excedidos.editarDescripcionCategoria" class="text-danger">
+                                Límites máximo alcanzado
+                            </small>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer flex-center">
