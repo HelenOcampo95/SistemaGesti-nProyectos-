@@ -17,11 +17,13 @@ const appProyectos = createApp({
                 fecha_entrega: '',
                 estado_proyecto: '',
                 id_categoria: '',
-                nombre_categoria: ''
+                nombre_categoria: '',
+                obs_proyecto: ''
             },
             limites: {
                 editNomProyecto: 45,
-                editDesProyecto: 200
+                editDesProyecto: 200,
+                obs_proyecto: 250
             },
             
         }
@@ -35,7 +37,8 @@ const appProyectos = createApp({
         excedidos(){
             return {
                 nombre: this.formProyecto.editNomProyecto.length >= this.limites.editNomProyecto,
-                descripcion: this.formProyecto.editDesProyecto.length >= this.limites.editDesProyecto
+                descripcion: this.formProyecto.editDesProyecto.length >= this.limites.editDesProyecto,
+                observacion: this.formProyecto.obs_proyecto.length >= this.limites.obs_proyecto
             }
         }
     },
@@ -136,7 +139,78 @@ const appProyectos = createApp({
                 .finally(() => {
                     desactivarLoadBtn('btn_vincular_estudiante');
                 });
+        },
+        finalizarProyecto(){
+            const id_proyecto = $('#id_proyecto_finalizar').val();
+            const observacion = this.formProyecto.obs_proyecto;
+            
+            if(!observacion.trim()){
+                Swal.fire({
+                    title: '¡Atención!',
+                    text: 'Todos los campos son obligatorios',
+                    icon: 'warning',
+                    confirmButtonText: 'Entendido'
+                });
+                return;
             }
+
+            axios.post(`/finalizar-proyecto/${id_proyecto}`, {
+                observacion_proyecto: observacion
+            })
+            .then( res => {
+                toastr.success('Se finalizo correctamente el proyecto');
+                window.location.reload();
+            })
+            .catch( error => {
+                Swal.fire({
+                    title: '¡Ups!',
+                    text: 'No pudimos guardar la observación',
+                    icon: 'error',
+                    confirmButtonText: 'Cerrar'
+                }); 
+            
+            })
+            .finally( () => {
+                desactivarLoadBtn('btn_calificar_tarea');
+            })
+        },
+        avalarProyecto() {
+            // 1. Capturamos el ID (asegúrate que el input tenga id="id_proyecto")
+            const id_proyecto = $('#id_proyecto').val();
+
+            // 2. Mostrar confirmación antes de proceder
+            Swal.fire({
+                title: '¿Deseas avalar este proyecto?',
+                text: "Una vez avalado, el estado del proyecto se actualizará formalmente.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107', // Color warning (amarillo) para que combine con el botón
+                cancelButtonColor: '#7239ea',
+                confirmButtonText: 'Sí, avalar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    
+                    axios.post(`/avalar-proyecto/${id_proyecto}`)
+                    .then(res => {
+                        toastr.success('El proyecto ha sido avalado correctamente');
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        Swal.fire({
+                            title: '¡Ups!',
+                            text: 'Hubo un error al intentar avalar el proyecto',
+                            icon: 'error',
+                            confirmButtonText: 'Cerrar'
+                        });
+                    })
+                    .finally(() => {
+                        desactivarLoadBtn('btn_avalar_proyecto');
+                    });
+                }
+            });
+        }
         
     }
 

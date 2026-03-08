@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\DashboardUpdated;
+use App\Events\NotificacionUsuario;
 use App\Events\ProyectoCreado;
 use App\Http\Requests\Proyectos\RegistrarProyectoRequest;
 use App\Models\Categorias;
@@ -91,6 +92,17 @@ class ProyectoController extends Controller
             }
 
             DB::commit();
+
+            $notificacion = \App\Models\Notificacion::create([
+                'id_usuario'                => $proyecto->id_docente_lider,
+                'tipo_notificacion'         => 'proyecto',
+                'id_referencia'             => $proyecto->id_proyecto,
+                'titulo_notificacion'       => 'Proyecto registrado',
+                'descripcion_notificacion'  => "El estudiante ha realizado el registro del proyecto:". ($proyecto->nombre_proyecto ?? 'Sin nombre'),
+                'url_notificacion'          => "/detalle/{$proyecto->id_proyecto}", 
+                'leida'                     => 0
+            ]); 
+
             
             $DashboardController = new DashboardController();
             $data = $DashboardController->obtenerDashboardData($regla->id_docente_lider);
@@ -98,6 +110,8 @@ class ProyectoController extends Controller
             $dataLimpia = json_decode(json_encode($data), true); 
 
             event(new DashboardUpdated($dataLimpia));
+            // Obtenemos la data específica para cada usuario del equipo
+            event(new NotificacionUsuario(($notificacion)));
 
             return response()->json(['mensaje' => 'Proyecto creado con éxito', 'id' => $proyecto->id_proyecto], 200);
 
@@ -290,6 +304,35 @@ class ProyectoController extends Controller
             ], 500);
         }
     }
-    
 
+    public function finalizarProyecto(Request $request, $id_proyecto){
+        
+        try{
+            $proyecto = Proyecto::findOrFail($id_proyecto);
+
+            $proyecto->estado_proyecto = Proyecto::FINALIZADO;
+            $proyecto->observacion_proyecto = $request->observacion_proyecto;
+            $proyecto->save();
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error en el servidor: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function avalarProyecto($id_proyecto){
+        try{
+            $proyecto = Proyecto::findOrFail($id_proyecto);
+
+            $proyecto->estado_proyecto = Proyecto::AVALADO;
+            $proyecto->save();
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error en el servidor: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
 }

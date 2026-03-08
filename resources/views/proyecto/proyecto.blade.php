@@ -163,7 +163,7 @@
                                     class="form-control form-control-solid" 
                                     id="fecha_inicio"  
                                     name="fecha_inicio"  
-                                    autocomplete="off"/>
+                                    />
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="fs-6 fw-semibold mb-2 required" >Fecha entrega</label>
@@ -171,7 +171,7 @@
                                     class="form-control form-control-solid"
                                     id="fecha_entrega" 
                                     name="fecha_entrega"
-                                    autocomplete="off"/>
+                                    />
                             </div>
                         </div>
                         <div class="mb-5 fv-row mb-7">

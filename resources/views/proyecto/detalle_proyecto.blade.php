@@ -37,35 +37,52 @@
 							<div class="col">
 								<div class="card card-flush h-xl-70">
 									<div class="card-header pt-5">
-										<div class="d-flex flex-column mt-8">
-											<span class="text-gray-900 fs-4 fw-bold me-1">{{$proyecto->nombre_proyecto}} 
+										<div class="d-flex flex-column">
+											<span class="text-gray-900 fs-4 fw-bold me-1">
+												{{$proyecto->nombre_proyecto}} 
 												<span class="badge badge-light-success fw-bold fs-8 px-3 py-1">{{$proyecto->estado_proyecto}}</span>
 											</span>
 											<span class="text-muted fw-bold fs-7">{{$proyecto->categoria->nombre_categoria}}</span>
 										</div>
-										@can('Ver_actividades')
-											<div class="card-toolbar">
-												<button class="btn btn-icon btn-color-gray-400 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
+
+										<div class="card-toolbar">
+											@can('Finalizar_proyecto')
+												@if($proyecto->estado_proyecto == \App\Models\Proyecto::ACTIVO)
+													<button class="btn btn-sm fw-bold btn-success me-3" data-bs-toggle="modal" data-bs-target="#modal_finalizar_proyecto">
+														<i class="ki-duotone ki-plus fs-3"></i>Finalizar Proyecto
+													</button>
+												@endif
+											@endcan
+											@can('Avalar_proyecto')
+												@if($proyecto->estado_proyecto == \App\Models\Proyecto::FINALIZADO)
+													<button class="btn btn-sm fw-bold btn-warning me-3" @click="avalarProyecto({{$proyecto->id_proyecto}})">
+														<i class="ki-duotone ki-verify fs-3"></i>Avalar Proyecto
+													</button>
+												@endif
+											@endcan
+											@can('Ver_actividades')
+												<button class="btn btn-icon btn-color-gray-400 btn-active-color-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
 													<span class="svg-icon svg-icon-1 svg-icon-gray-300 me-n1">
 														<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-														<rect opacity="0.3" x="2" y="2" width="20" height="20" rx="4" fill="currentColor" />
-														<rect x="11" y="11" width="2.6" height="2.6" rx="1.3" fill="currentColor" />
-														<rect x="15" y="11" width="2.6" height="2.6" rx="1.3" fill="currentColor" />
-														<rect x="7" y="11" width="2.6" height="2.6" rx="1.3" fill="currentColor" />
+															<rect opacity="0.3" x="2" y="2" width="20" height="20" rx="4" fill="currentColor" />
+															<rect x="11" y="11" width="2.6" height="2.6" rx="1.3" fill="currentColor" />
+															<rect x="15" y="11" width="2.6" height="2.6" rx="1.3" fill="currentColor" />
+															<rect x="7" y="11" width="2.6" height="2.6" rx="1.3" fill="currentColor" />
 														</svg>
 													</span>
 												</button>
+
 												<div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px" data-kt-menu="true">
 													<div class="separator mb-3 opacity-75"></div>
-														<div class="menu-item px-3">
-															<a href="#" class="menu-link px-3"data-bs-toggle="modal" data-bs-target="#modal_editar_proyecto" @click="prepararEdicion({{ json_encode($proyecto) }})">Editar Proyecto</a>
-														</div>
-														<div class="menu-item px-3">
-															<a href="#" class="menu-link px-3"data-bs-toggle="modal" data-bs-target="#modal_vincular_estudiante">Vincular estudiante</a>
-														</div>										
+													<div class="menu-item px-3">
+														<a href="#" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#modal_editar_proyecto" @click="prepararEdicion({{ json_encode($proyecto) }})">Editar Proyecto</a>
+													</div>
+													<div class="menu-item px-3">
+														<a href="#" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#modal_vincular_estudiante">Vincular estudiante</a>
+													</div>
 												</div>
-											</div>
-										@endcan
+											@endcan
+										</div>
 									</div>
 									{{-- Tamaño del card  --}}
 									<div class="card-body d-flex flex-column justify-content-between p-7 px-0 min-h-250px m-3">
@@ -493,14 +510,14 @@
 										</div>
 										</div>
 							</div>
-									<div class="modal-footer flex-center">
-										<button type="button" id="btn_editar_proyecto" class="btn btn-success" @click.prevent="actualizarProyecto(proyecto)">
-											<span class="indicator-label">Editar proyecto</span>
-											<span class="indicator-progress">Por favor espere...
-											<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
-										</button>
-									</div>
-									<!-- ./ Footer modal materias primas -->
+							<div class="modal-footer flex-center">
+								<button type="button" id="btn_editar_proyecto" class="btn btn-success" @click.prevent="actualizarProyecto(proyecto)">
+									<span class="indicator-label">Editar proyecto</span>
+									<span class="indicator-progress">Por favor espere...
+									<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+								</button>
+							</div>
+							<!-- ./ Footer modal materias primas -->
 			</form>
 			<!--end::Form-->
 		</div>
@@ -511,44 +528,98 @@
 		<div class="modal-content" id="vincular_estudiante">
 			<form class="form" id="formulario_vincular_estudiante">
 				<!-- Encabezado modal materias primas -->
-							<div class="modal-header" id="kt_modal_add_customer_header">
-								<h2 class="fw-bold">Vincular estudiante</h2>
-									<div id="kt_modal_add_customer_close" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal" aria-label="Close">
-										<span class="svg-icon svg-icon-1">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-												<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
-												<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
-											</svg>
-										</span>
-									</div>
-							</div>					
-							<div class="modal-body py-10 px-lg-17">
-									<div class="scroll-y me-n7 pe-7" id="kt_modal_add_customer_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_customer_header" data-kt-scroll-wrappers="#kt_modal_add_customer_scroll" data-kt-scroll-offset="300px">
-										<div class="mb-3">
-										<label class="fs-6 fw-semibold mb-2 required">Estudiantes participantes</label>
-										<div class="border p-2 rounded d-flex flex-wrap align-items-center" style="min-height: 45px; background-color: #f5f8fa;">
-											<div v-for="(correo, index) in colaboradores" :key="index" class="badge badge-secondary m-1 p-2 d-flex align-items-center">
-											@{{ correo }}
-											<span @click="eliminarColaborador(index)" class="ms-2 cursor-pointer text-danger">&times;</span>
-											</div>
-											<input type="email" v-model="nuevo_correo"  @keydown.enter.prevent="agregarColaborador" 
-											class="border-0 bg-transparent flex-grow-1" 
-											placeholder="Escribe un correo y pulsa Enter"
-											style="outline: none;">
-										</div>
-											<small class="text-muted">Los usuarios que no existan serán invitados automáticamente.</small>
-										</div>
-										<input type="hidden" name="correo_usuario" id="correo_usuarios_hidden">
-									</div>
+				<div class="modal-header" id="kt_modal_add_customer_header">
+					<h2 class="fw-bold">Vincular estudiante</h2>
+					<div id="kt_modal_add_customer_close" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal" aria-label="Close">
+						<span class="svg-icon svg-icon-1">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+								<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+							</svg>
+						</span>
+					</div>
+				</div>					
+				<div class="modal-body py-10 px-lg-17">
+					<div class="scroll-y me-n7 pe-7" id="kt_modal_add_customer_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_customer_header" data-kt-scroll-wrappers="#kt_modal_add_customer_scroll" data-kt-scroll-offset="300px">
+						<div class="mb-3">
+							<label class="fs-6 fw-semibold mb-2 required">Estudiantes participantes</label>
+							<div class="border p-2 rounded d-flex flex-wrap align-items-center" style="min-height: 45px; background-color: #f5f8fa;">
+								<div v-for="(correo, index) in colaboradores" :key="index" class="badge badge-secondary m-1 p-2 d-flex align-items-center">
+									@{{ correo }}
+									<span @click="eliminarColaborador(index)" class="ms-2 cursor-pointer text-danger">&times;</span>
+								</div>
+								<input type="email" v-model="nuevo_correo"  @keydown.enter.prevent="agregarColaborador" 
+									class="border-0 bg-transparent flex-grow-1" 
+									placeholder="Escribe un correo y pulsa Enter"
+									style="outline: none;">
 							</div>
-									<div class="modal-footer flex-center">
-										<button type="button" id="btn_vincular_estudiante" class="btn btn-success" @click.prevent="vincularEstudiante(proyecto)">
-											<span class="indicator-label">Registrar estudiante</span>
-											<span class="indicator-progress">Por favor espere...
-											<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
-										</button>
-									</div>
-									<!-- ./ Footer modal materias primas -->
+							<small class="text-muted">Los usuarios que no existan serán invitados automáticamente.</small>
+						</div>
+						<input type="hidden" name="correo_usuario" id="correo_usuarios_hidden">
+					</div>
+				</div>
+				<div class="modal-footer flex-center">
+					<button type="button" id="btn_vincular_estudiante" class="btn btn-success" @click.prevent="vincularEstudiante(proyecto)">
+						<span class="indicator-label">Registrar estudiante</span>
+						<span class="indicator-progress">Por favor espere...
+						<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+					</button>
+				</div>
+				<!-- ./ Footer modal materias primas -->
+			</form>
+			<!--end::Form-->
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="modal_finalizar_proyecto" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+	<div class="modal-dialog modal-dialog-centered mw-650px">
+		<div class="modal-content" id="finalizar_proyecto">
+			<form class="form" id="formulario_finalizar_proyecto">
+				<!-- Encabezado modal materias primas -->
+				<div class="modal-header" id="kt_modal_add_customer_header">
+					<h2 class="fw-bold">Proyecto</h2>
+					<div id="kt_modal_add_customer_close" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal" aria-label="Close">
+						<span class="svg-icon svg-icon-1">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+								<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+							</svg>
+						</span>
+					</div>
+				</div>					
+				<div class="modal-body py-10 px-lg-17">
+					<div class="scroll-y me-n7 pe-7" id="kt_modal_add_customer_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_customer_header" data-kt-scroll-wrappers="#kt_modal_add_customer_scroll" data-kt-scroll-offset="300px">
+						<div class="mb-3">
+							<label class="fs-6 fw-semibold mb-2 required">Observación</label>
+							<textarea class="form-control form-control-solid form-control-sm" 
+								name="observacion_proyecto" 
+								id="observacion_proyecto" 
+								v-model="formProyecto.obs_proyecto" 
+								:class="{ 'border-danger': excedidos.observacion}"
+                                :maxlength="limites.obs_proyecto"
+								rows="4">
+							</textarea>
+							<div class="d-flex justify-content-between mt-2">
+                                <small
+                                    :class="excedidos.observacion ? 'text-danger' : 'text-muted'"
+                                    v-text="formProyecto.obs_proyecto.length + ' / ' + limites.obs_proyecto + ' caracteres'">
+                                </small>
+                                <small  v-if="excedidos.observacion" class="text-danger">
+                                    Límite máximo alcanzado.
+                                </small>
+                            </div>
+						</div>
+						<input type="hidden" name="id_proyecto_finalizar" id="id_proyecto_finalizar" value="{{$proyecto->id_proyecto}}">
+					</div>
+				</div>
+				<div class="modal-footer flex-center">
+					<button type="button" id="btn_finalizar_proyecto" class="btn btn-success" @click.prevent="finalizarProyecto">
+						<span class="indicator-label">Registrar</span>
+						<span class="indicator-progress">Por favor espere...
+						<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+					</button>
+				</div>
+				<!-- ./ Footer modal materias primas -->
 			</form>
 			<!--end::Form-->
 		</div>

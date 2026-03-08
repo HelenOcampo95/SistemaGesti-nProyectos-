@@ -67,6 +67,8 @@ Route::middleware('permisos:Crear_proyecto')->group( function() {
     Route::post('/actualizar-proyecto', [ProyectoController::class, 'actualizarProyecto'])->name('proyecto.actualizar');
     Route::get('/select-proyecto', [ProyectoController::class, 'selectProyecto']);
     Route::post('/vincular-estudiante', [ProyectoController::class, 'vincularEstudiante']);
+    Route::post('/finalizar-proyecto/{id_proyecto}', [ProyectoController::class, 'finalizarProyecto']);
+    Route::post('/avalar-proyecto/{id_proyecto}', [ProyectoController::class, 'avalarProyecto']);
 
 //Listar todos los proyectos para lideres y directores
 Route::get('/ver-proyectos', [ProyectoController::class, 'verListadoProyecto'])->name('listarProyectos');
@@ -104,7 +106,7 @@ Route::get('/version/{id_version}', [VersionesController::class, 'verVersion']);
 Route::post('/aceptar-version/{id_version}', [VersionesController::class, 'aceptarVersion']);
 Route::post('/rechazar-version/{id_version}', [VersionesController::class, 'rechazarVersion']);
 
-Route::get('/notificaciones/get', [NotificacionController::class, 'getNotificaciones']);
+Route::get('/notificaciones/listar', [NotificacionController::class, 'getNotificaciones']);
 Route::post('/notificaciones/leer/{id}', [NotificacionController::class, 'marcarComoLeida']);
 
 });

@@ -12,6 +12,15 @@ if (userId) {
     window.Echo.private(`notificacion.creada.${userId}`)
         .listen('.NotificacionEvent', (e) => {
             actualizarContadorNotificaciones();
+
+            axios.get('/notificaciones/listar')
+                .then(response => {
+                    document.getElementById('contenedor-notificaciones').innerHTML = response.data;
+                })
+                .catch  (error => {
+                    console.error('Error al cargar las notificaciones', error);
+                });
+
         });
 } else {
     console.log("El usuario no está autenticado, no se activaron las notificaciones.");

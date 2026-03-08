@@ -212,7 +212,7 @@ const appProyectos = createApp({
                 $( elemento ).daterangepicker({
                     singleDatePicker: true,
                     // showDropdowns: true,
-                    autoUpdateInput: false,
+                    // autoUpdateInput: false,
                     minYear: 1901,
                     maxYear: parseInt(moment().format("YYYY"),12),
                     minDate: today,
@@ -259,7 +259,7 @@ const appProyectos = createApp({
             $( elemento ).daterangepicker({
                 singleDatePicker: true,
                 // showDropdowns: true,
-                autoUpdateInput: false,
+                // autoUpdateInput: false,
                 minYear: 1901,
                 maxYear: parseInt(moment().format("YYYY"),12),
                 locale: {

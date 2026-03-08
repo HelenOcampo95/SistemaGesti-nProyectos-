@@ -36,7 +36,29 @@ class TareasController extends Controller
             $tarea->titulo_tarea            = $request->titulo_tarea;
             $tarea->save(); 
             
-            
+        $idDueño = $tarea->proyecto->id_usuario; // El que registró el proyecto
+        
+        // Extraemos los IDs de la tabla de participantes
+        $idsParticipantes = $tarea->proyecto->participantes->pluck('id_usuario')->toArray();
+
+        // Combinamos ambos (Dueño + Participantes)
+        $destinatarios = array_merge([$idDueño], $idsParticipantes);
+
+        foreach ($destinatarios as $idUsuario) {
+
+            $notificacion = \App\Models\Notificacion::create([
+                'id_usuario'                => $idUsuario,
+                'tipo_notificacion'         => 'tarea',
+                'id_referencia'             => $tarea->id_tarea,
+                'titulo_notificacion'       => 'Tarea asignada',
+                'descripcion_notificacion'  => "El docente ha asignado una tarea:". ($tarea->titulo_tarea ?? 'Sin nombre'),
+                'url_notificacion'          => "/tarea/{$tarea->id_tarea}", 
+                'leida'                     => 0
+            ]); 
+
+            // Obtenemos la data específica para cada usuario del equipo
+            event(new NotificacionUsuario(($notificacion)));
+        }    
             return response()->json('La tarea se ha asignado correctamente', 200);   
         }catch (\Exception $e) {
             return response()->json('Error al asignar la tarea' . $e->getMessage(), 422);

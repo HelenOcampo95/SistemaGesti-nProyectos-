@@ -95,7 +95,7 @@
                         
                         <div class="app-navbar flex-shrink-0">
                             <div class="app-navbar-item ms-1 ms-lg-3">
-                                <div class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px w-md-40px h-md-40px position-relative" 
+                                <div class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-gray w-35px h-35px w-md-40px h-md-40px position-relative" 
                                     data-kt-menu-trigger="{default: 'click', lg: 'hover'}" 
                                     data-kt-menu-attach="parent" 
                                     data-kt-menu-placement="bottom-end">
@@ -131,30 +131,7 @@
                                                 ->take(15)->get();
                                         @endphp
                                         <div class="separator mb-1 opacity-75"></div>
-                                        @forelse($notificaciones as $notif)
-                                            <div class="d-flex flex-stack p-3 m-2 border-bottom border-gray-200 {{ $notif->leida == 0 ? 'bg-light-success' : 'bg-white' }}" style="border-radius: 20px;">
-                                                <div class="d-flex align-items-center me-2">
-                                                    <div class="mb-0">
-                                                        <div class="fs-6 text-gray-800 fw-bold"> 
-                                                            {{ $notif->titulo_notificacion }}
-                                                        </div>
-                                                        <div class="text-gray-400 fs-7">{{ $notif->descripcion_notificacion }}</div>
-                                                        <div class="text-gray-400 fs-7">
-                                                            <a href="{{ $notif->url_notificacion }}" 
-                                                                class="fs-8 text-success text-hover-success" 
-                                                                onclick="marcarLeida(event, {{ $notif->id_notificacion }}, '{{ $notif->url_notificacion }}')">
-                                                                    Ver Más
-                                                            </a>
-                                                        </div>
-                                                        <span class="text-gray-500 fs-9">{{ $notif->actualizado_en->diffForHumans() }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @empty
-                                            <div id="notificacion-vacia" class="text-center py-10">
-                                                <div class="text-gray-400 fs-7">No tienes notificaciones por ahora.</div>
-                                            </div>
-                                        @endforelse
+                                        @include('notificaciones.listar_notificaciones')
                                     </div>
 
                                     <div class="py-3 text-center border-top">
@@ -282,7 +259,7 @@
                                 @endrole
                                 @role(['Administrador'])
                                     <div class="menu-item">
-                                        <a class="menu-link" href="{{ route('tareas') }}">
+                                        <a class="menu-link" href="#">
                                             <span class="menu-icon">
                                                 <i class="bi bi-people-fill fs-3"></i>
                                             </span>
@@ -383,7 +360,6 @@ function marcarLeida(event, id, url) {
     });
 }
 function actualizarContadorNotificaciones() {
-    // Supongamos que tu contador tiene el id "contador-notificaciones"
     const contador = document.getElementById('punto-rojo');
     
     if (contador) {

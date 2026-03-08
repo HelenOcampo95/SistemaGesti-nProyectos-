@@ -19,6 +19,7 @@ class Proyecto extends Model
     const UPDATED_AT = 'actualizado_en';
     const FINALIZADO = 'Finalizado';
     const ACTIVO     = 'Activo';
+    const AVALADO    = 'Avalado'; 
 
     protected $fillable = [
         'id_proyecto',

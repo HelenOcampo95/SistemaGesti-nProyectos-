@@ -14,14 +14,7 @@ class NotificacionController extends Controller
             ->take(10)
             ->get();
 
-        $noLeidas = Notificacion::where('id_usuario', auth()->id())
-            ->where('leida', 0)
-            ->count();
-
-        return response()->json([
-        'notificaciones' => $notificaciones, // Enviamos la colección, no el HTML
-        'count' => $noLeidas
-    ]);
+        return view('notificaciones.listar_notificaciones', compact('notificaciones'))->render();
     }
 
     public function marcarComoLeida($id_notificacion)
