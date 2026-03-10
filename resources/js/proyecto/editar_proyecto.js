@@ -20,10 +20,19 @@ const appProyectos = createApp({
                 nombre_categoria: '',
                 obs_proyecto: ''
             },
+            nuevaVersion: {
+                versionPro: '',
+                descripcion_cambios: '',
+                archivo: null,
+                arc_relacionados: ''
+            },
             limites: {
                 editNomProyecto: 45,
                 editDesProyecto: 200,
-                obs_proyecto: 250
+                obs_proyecto: 250,
+                arc_relacionados: 100,
+                versionPro: 20,
+                descripcion_cambios:45
             },
             
         }
@@ -38,7 +47,10 @@ const appProyectos = createApp({
             return {
                 nombre: this.formProyecto.editNomProyecto.length >= this.limites.editNomProyecto,
                 descripcion: this.formProyecto.editDesProyecto.length >= this.limites.editDesProyecto,
-                observacion: this.formProyecto.obs_proyecto.length >= this.limites.obs_proyecto
+                observacion: this.formProyecto.obs_proyecto.length >= this.limites.obs_proyecto,
+                url: this.nuevaVersion.arc_relacionados.length >= this.limites.arc_relacionados,
+                version: this.nuevaVersion.versionPro.length  >= this.limites.versionPro,
+                descripcionVer: this.nuevaVersion.descripcion_cambios.length >= this.limites.descripcion_cambios
             }
         }
     },
@@ -210,8 +222,36 @@ const appProyectos = createApp({
                     });
                 }
             });
+        },
+        registrarVersion(){
+            const id_proyecto   = $('#id_proyecto_version').val();
+            console.log(id_proyecto); 
+            const descripcion   = this.nuevaVersion.descripcion_cambios;
+            const archivos      = this.nuevaVersion.arc_relacionados;
+            const versiones       = this.nuevaVersion.versionPro;
+            
+            axios.post(`/registrar-version/${id_proyecto}`, {
+                archivos_relacionados   : archivos,
+                descripcion_cambios     : descripcion,
+                version                 : versiones
+            })
+            .then( res => {
+                toastr.success('Se registro correctamente la versión');
+                window.location.reload();
+            })
+            .catch( error => {
+                Swal.fire({
+                    title: '¡Ups!',
+                    text: 'No pudimos guardar la versión',
+                    icon: 'error',
+                    confirmButtonText: 'Cerrar'
+                }); 
+            
+            })
+            .finally( () => {
+                desactivarLoadBtn('btn_registrar_version');
+            })
         }
-        
     }
 
 });

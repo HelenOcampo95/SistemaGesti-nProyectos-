@@ -20,7 +20,6 @@ if (userId) {
                 .catch  (error => {
                     console.error('Error al cargar las notificaciones', error);
                 });
-
         });
 } else {
     console.log("El usuario no está autenticado, no se activaron las notificaciones.");

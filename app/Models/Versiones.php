@@ -19,6 +19,15 @@ class Versiones extends Model
     const ACEPTADA   = 'Aceptada';
     const PENDIENTE  = 'Pendiente';
     
+    protected $fillable = [
+        'id_proyecto', 
+        'version', 
+        'descripcion_cambios', 
+        'fecha_modificacion', 
+        'archivos_relacionados', 
+        'estado_version'
+    ];
+
     public function proyecto() {
         return $this->belongsTo(Proyecto::class, 'id_proyecto');
     }

@@ -37,9 +37,9 @@ const appDashboard = createApp({
         this.idDocente = input.value;
 
         
-        this.cargarDashboard();
+        this.cargarDashboard(); 
 
-        Echo.channel('dashboard.creada')
+        Echo.channel('dashboard.institucional')
             .listen('.DashboardDataEvent', (e) => {
                 this.cargarDashboard(); 
 

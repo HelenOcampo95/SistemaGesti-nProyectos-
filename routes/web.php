@@ -70,6 +70,7 @@ Route::middleware('permisos:Crear_proyecto')->group( function() {
     Route::post('/finalizar-proyecto/{id_proyecto}', [ProyectoController::class, 'finalizarProyecto']);
     Route::post('/avalar-proyecto/{id_proyecto}', [ProyectoController::class, 'avalarProyecto']);
 
+
 //Listar todos los proyectos para lideres y directores
 Route::get('/ver-proyectos', [ProyectoController::class, 'verListadoProyecto'])->name('listarProyectos');
 Route::get('/listar-proyectos', [ProyectoController::class, 'listarProyecto']);
@@ -105,6 +106,7 @@ Route::post('/calificar-tarea/{id_tarea}', [TareasController::class, 'calificarT
 Route::get('/version/{id_version}', [VersionesController::class, 'verVersion']);
 Route::post('/aceptar-version/{id_version}', [VersionesController::class, 'aceptarVersion']);
 Route::post('/rechazar-version/{id_version}', [VersionesController::class, 'rechazarVersion']);
+Route::post('/registrar-version/{id_proyecto}', [VersionesController::class, 'registrarVersion']);
 
 Route::get('/notificaciones/listar', [NotificacionController::class, 'getNotificaciones']);
 Route::post('/notificaciones/leer/{id}', [NotificacionController::class, 'marcarComoLeida']);

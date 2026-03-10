@@ -10,6 +10,7 @@ use App\Models\Categorias;
 use App\Models\Proyecto;
 use App\Models\Role;
 use App\Models\Usuarios;
+use App\Models\Versiones;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -99,8 +100,8 @@ class ProyectoController extends Controller
                 'id_referencia'             => $proyecto->id_proyecto,
                 'titulo_notificacion'       => 'Proyecto registrado',
                 'descripcion_notificacion'  => "El estudiante ha realizado el registro del proyecto:". ($proyecto->nombre_proyecto ?? 'Sin nombre'),
-                'url_notificacion'          => "/detalle/{$proyecto->id_proyecto}", 
-                'leida'                     => 0
+                'url_notificacion'          => "/detalle/{$proyecto->id_proyecto}", +
+                'leida'                     => 0 
             ]); 
 
             
@@ -334,5 +335,6 @@ class ProyectoController extends Controller
             ], 500);
         }
     }
+
     
 }
