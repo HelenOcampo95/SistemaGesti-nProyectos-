@@ -60,7 +60,7 @@
 													</button>
 												@endif
 											@endcan
-											@can('Ver_actividades')
+											
 												<button class="btn btn-icon btn-color-gray-400 btn-active-color-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
 													<span class="svg-icon svg-icon-1 svg-icon-gray-300 me-n1">
 														<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -74,17 +74,28 @@
 
 												<div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px" data-kt-menu="true">
 													<div class="separator mb-3 opacity-75"></div>
-													<div class="menu-item px-3">
-														<a href="#" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#modal_editar_proyecto" @click="prepararEdicion({{ json_encode($proyecto) }})">Editar Proyecto</a>
-													</div>
-													<div class="menu-item px-3">
-														<a href="#" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#modal_vincular_estudiante">Vincular estudiante</a>
-													</div>
-													<div class="menu-item px-3">
-														<a href="#" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#modal_registrar_version">Registrar versión</a>
-													</div>
+													@can('Editar_proyecto')
+														<div class="menu-item px-3">
+															<a href="#" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#modal_editar_proyecto" @click="prepararEdicion({{ json_encode($proyecto) }})">Editar Proyecto</a>
+														</div>
+													@endcan
+													@can('Vincular_estudiante')
+														<div class="menu-item px-3">
+															<a href="#" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#modal_vincular_estudiante">Vincular estudiante</a>
+														</div>
+													@endcan
+													@can('Registrar_version')
+														<div class="menu-item px-3">
+															<a href="#" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#modal_registrar_version">Registrar versión</a>
+														</div>
+													@endcan
+													@can('Reasignar_docente')
+														<div class="menu-item px-3">
+															<a href="#" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#modal_reasignar_docente">Reasignar docentes</a>
+														</div>
+													@endcan
 												</div>
-											@endcan
+											
 										</div>
 									</div>
 									{{-- Tamaño del card  --}}
@@ -187,7 +198,7 @@
 														@endforeach
 
 														@if($proyecto->participantes->isEmpty())
-															<div class="border border-gray-300 border-dashed rounded py-3 px-4 mb-3">
+															<div class="border border-gray-300 border-dashed rounded py-3 px-4 mb-3 me-4">
 																<span class="text-muted fs-7">No hay compañeros asignados.</span>
 															</div>
 														@endif
@@ -218,7 +229,6 @@
 							</div>
 						</div>
 					</div>
-					@can('Ver_actividades')
 						<div class="col-xl-4 mb-xl-10 align-self-start">
 							<div class="card card-flush">
 								<div class="card-header pt-7">
@@ -431,7 +441,6 @@
 							</div>
 							<!--end::List widget 10-->
 						</div>
-					@endcan	
 				</div>
 			</div>
 		</div>
@@ -556,7 +565,7 @@
 									placeholder="Escribe un correo y pulsa Enter"
 									style="outline: none;">
 							</div>
-							<small class="text-muted">Los usuarios que no existan serán invitados automáticamente.</small>
+							<small class="text-muted">Los usuarios deben estar previamente registrados en la plataforma para ser vinculados.</small>
 						</div>
 						<input type="hidden" name="correo_usuario" id="correo_usuarios_hidden">
 					</div>
@@ -709,7 +718,52 @@
 			<!--end::Form-->
 		</div>
 	</div>
-</div>				
+</div>
+<div class="modal fade" id="modal_reasignar_docente" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+	<div class="modal-dialog modal-dialog-centered mw-650px">
+		<div class="modal-content" id="reasignarDocente">
+			<form class="form" >
+				<!-- Encabezado modal materias primas -->
+				<div class="modal-header" id="kt_modal_add_customer_header">
+					<h2 class="fw-bold">Reasignar Docentes</h2>
+					<div id="kt_modal_add_customer_close" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal" aria-label="Close">
+						<span class="svg-icon svg-icon-1">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+								<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+							</svg>
+						</span>
+					</div>
+				</div>					
+				<div class="modal-body py-10 px-lg-17">
+					<div class="scroll-y me-n7 pe-7" id="kt_modal_add_customer_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_customer_header" data-kt-scroll-wrappers="#kt_modal_add_customer_scroll" data-kt-scroll-offset="300px">
+						<div class="card p-5 mb-5">
+							<div class="mb-5 fv-row">
+								<label class="form-label required">Docente Director</label>
+								<select  class="form-select form-select-solid" data-placeholder="Seleccione un docente" name="id_docente_director" id="id_docente_director" required></select>
+							</div>
+							<div class="mb-5 fv-row">
+								<label class="form-label required">Docente Lider</label>
+								<select  class="form-select form-select-solid" data-placeholder="Seleccione un docente" name="id_docente_lider" id="id_docente_lider" required></select>
+							</div>
+						</div>
+						<input type="hidden" name="id_proyecto" id="id_proyecto" value="{{$proyecto->id_proyecto}}">
+					</div>
+				</div>
+				<div class="modal-footer flex-center">
+					<button type="button" id="btn_reasignar_docente" class="btn btn-success" @click.prevent="reasignarDocente">
+						<span class="indicator-label">Reasignar</span>
+						<span class="indicator-progress">Por favor espere...
+						<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+					</button>
+				</div>
+				<!-- ./ Footer modal materias primas -->
+			</form>
+			<!--end::Form-->
+		</div>
+	</div>
+</div>
+<input type="hidden" id="id_proyecto" value="1">				
 @endsection
 @section('scripts')
     @vite('resources/js/proyecto/editar_proyecto.js')

@@ -12,13 +12,13 @@
 				<!--begin::Page title-->
 				<div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
 					<!--begin::Title-->
-					<h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">Tareas</h1>
+					<h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">Actividades</h1>
 					<!--end::Title-->
 					<!--begin::Breadcrumb-->
 					<ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
 					<!--begin::Item-->
 						<li class="breadcrumb-item text-muted">
-							<a href="../../demo1/dist/index.html" class="text-muted text-hover-primary">Información tareas asignadas</a>
+							<a href="../../demo1/dist/index.html" class="text-muted text-hover-primary">Información de las actividades asignadas</a>
 						</li>
 						<!--end::Item-->
 					</ul>
@@ -27,7 +27,7 @@
 				<!--end::Page title-->
 				<!--begin::Actions-->
 				<div class="d-flex align-items-center gap-2 gap-lg-3">
-					<a href="#" class="btn btn-sm fw-bold btn-success" data-bs-toggle="modal" data-bs-target="#modal_asignar_tarea">Asignar Tareas</a>
+					<a href="#" class="btn btn-sm fw-bold btn-success" data-bs-toggle="modal" data-bs-target="#modal_asignar_tarea">Asignar actividad</a>
 					<!--end::Primary button-->
 				</div>
 			<!--end::Actions-->
@@ -51,7 +51,7 @@
 									<path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
 								</svg>
 							</span>
-							<input type="text" data-kt-customer-table-filter="search" class="form-control form-control-solid w-300px ps-15" id="buscador_tareas" placeholder="Buscar pedido"/>
+							<input type="text" data-kt-customer-table-filter="search" class="form-control form-control-solid w-300px ps-15" id="buscador_tareas" placeholder="Buscar tareas"/>
 						</div>
 						<!-- ./ Input buscador de materias primas -->
 						</div>
@@ -206,7 +206,7 @@
                 <input type="hidden" id="id_tarea_editar" name="id_tarea">
 
                 <div class="modal-header" id="header_editar_tarea">
-                    <h2 class="fw-bold">Editar tarea</h2>
+                    <h2 class="fw-bold">Editar actividad</h2>
                     <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal" aria-label="Close">
                         ✖
                     </div>
@@ -304,7 +304,7 @@
             <div class="modal-body py-8">
                 <div class="mb-6">
                     <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="fw-bold text-gray-800">Progreso de la tarea</span>
+                        <span class="fw-bold text-gray-800">Progreso de la actividad</span>
                         <span class="fw-bold text-success" id="det_avance_texto">0%</span>
                     </div>
                     <div class="progress h-6px w-100 bg-light-success">

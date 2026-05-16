@@ -1,28 +1,29 @@
 @extends('iniciar_sesion.iniciar_sesion')
 
 @section('formularioAutenticacion')
-    <form class="form w-100" id="form_registro">
+    <form class="form w-100 mb-1" id="form_registro">
         @csrf
 
-        <div class="text-center mb-10">
+        <div class="text-center">
+            <img src="../assets/images/logo/areandina.png" alt="Areandina" width="250" height="150">
             <h1 class="text-dark mb-3">Crear cuenta</h1>
         </div>
 
         <!-- Nombre -->
         <div class="fv-row mb-7">
-            <label class="form-label fs-6 fw-bold text-dark">Nombres</label>
+            <label class="form-label fs-6 fw-bold text-dark required">Nombres</label>
             <input type="text" name="nombre_usuario" class="form-control form-control-lg form-control-solid" required />
         </div>
         <div class="fv-row mb-7">
-            <label class="form-label fs-6 fw-bold text-dark">Apellidos</label>
+            <label class="form-label fs-6 fw-bold text-dark required">Apellidos</label>
             <input type="text" name="apellido_usuario" class="form-control form-control-lg form-control-solid" required />
         </div>
         <div class="fv-row mb-7">
-            <label class="form-label fs-6 fw-bold text-dark">Cédula</label>
+            <label class="form-label fs-6 fw-bold text-dark required">Cédula</label>
             <input type="text" name="cedula" class="form-control form-control-lg form-control-solid" required />
         </div>
         <div class="fv-row mb-7">
-            <label class="form-label fs-6 fw-bold text-dark">Rol</label>
+            <label class="form-label fs-6 fw-bold text-dark required">Rol</label>
             <select 
                 name="id_rol"
                 class="form-select form-select-solid"
@@ -41,12 +42,12 @@
         </div>
         <!-- Correo -->
         <div class="fv-row mb-7">
-            <label class="form-label fs-6 fw-bold text-dark">Correo electrónico</label>
+            <label class="form-label fs-6 fw-bold text-dark required">Correo electrónico</label>
             <input type="email" name="correo_usuario" class="form-control form-control-lg form-control-solid" required />
         </div>
         <!-- Contraseña -->
         <div class="fv-row mb-7">
-            <label class="form-label fs-6 fw-bold text-dark">Contraseña</label>
+            <label class="form-label fs-6 fw-bold text-dark required">Contraseña</label>
             <input type="password" name="contrasena_usuario" class="form-control form-control-lg form-control-solid" required />
         </div>
         <!-- Botón -->

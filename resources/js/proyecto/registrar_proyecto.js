@@ -300,20 +300,34 @@ const appProyectos = createApp({
         },
         agregarColaborador() {
             const correo = this.nuevo_correo.trim().toLowerCase();
-            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-            if (correo === '') return;
-            
-            if (!regex.test(correo)) {
-                return Swal.fire('Correo inválido', 'Por favor ingresa un email real', 'warning');
-            }
+            if (!correo) return;
 
+            // 1. Verificar si ya está en la lista local para no repetirlo
             if (this.colaboradores.includes(correo)) {
-                return Swal.fire('Repetido', 'Este correo ya está en la lista', 'info');
+                Swal.fire('Atención', 'Este correo ya fue agregado', 'warning');
+                return;
             }
 
-            this.colaboradores.push(correo);
-            this.nuevo_correo = '';
+            // 2. Consultamos al servidor si el correo existe
+            // Reutilizamos una ruta de búsqueda o creamos una simple
+            axios.get(`/validar-correo/${correo}`)
+                .then(response => {
+                    // SI EXISTE: Lo agregamos a la lista de "badges"
+                    this.colaboradores.push(correo);
+                    this.nuevo_correo = ''; 
+                })
+                .catch(error => {
+                    // SI NO EXISTE: Mostramos la alerta en rojo que pides
+                    Swal.fire({
+                        title: 'Usuario no encontrado',
+                        text: `El correo "${correo}" no está registrado en el sistema.`,
+                        icon: 'error',
+                        confirmButtonColor: '#f27474'
+                    });
+                    // Opcional: limpiar el input si quieres que lo intente de nuevo
+                    this.nuevo_correo = '';
+                });
         },
 
         eliminarColaborador(index) {
@@ -357,8 +371,19 @@ const appProyectos = createApp({
                         .then(() => window.location.reload());
                 })
                 .catch(error => {
-                    console.error(error);
-                    Swal.fire('Error', 'No se pudo crear el proyecto', 'error');
+                    // 1. Extraemos el mensaje de error enviado por el backend (el Exception)
+                    let mensajeError = 'No se pudo crear el proyecto';
+                    
+                    if (error.response && error.response.data && error.response.data.detalle) {
+                        // Aquí capturamos: "El colaborador con correo '...' no está registrado"
+                        mensajeError = error.response.data.detalle;
+                    } else if (error.response && error.response.data.message) {
+                        // Captura errores de validación por defecto de Laravel
+                        mensajeError = error.response.data.message;
+                    }
+
+                    // 2. Mostramos el error específico al usuario
+                    Swal.fire('Error', mensajeError, 'error');
                 })
                 .finally(() => {
                     desactivarLoadBtn('btn_crear_proyecto');

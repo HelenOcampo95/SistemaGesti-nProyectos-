@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categorias;
+use App\Models\Eventos;
 use App\Models\Proyecto;
 use App\Models\Tareas;
 use App\Models\Usuarios;
@@ -10,6 +11,7 @@ use App\Models\Versiones;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon as SupportCarbon;
+use Illuminate\Support\Facades\DB;
 use SebastianBergmann\Environment\Console;
 
 class DashboardController extends Controller
@@ -21,6 +23,7 @@ class DashboardController extends Controller
         $esAdmin = $user->hasRole('Administrador');
         $id_docente = $esAdmin ? null : $user->id_usuario;
         $fechaActual = Carbon::now()->toDateString();
+        $id_usuario = $user->id_usuario;
 
         // --- CONSULTAS DE PROYECTOS ---
         // Si hay id_docente filtra, si no, trae todo (whereNotNull se usa como truco para ignorar el filtro)
@@ -103,6 +106,31 @@ class DashboardController extends Controller
                 return $proyecto;
             });
 
+        $eventos = Eventos::when(!$esAdmin, function ($query) use ($id_usuario) {
+            return $query->whereIn('id_categoria', function($subquery) use ($id_usuario) {
+                // Seleccionamos los IDs de categorías de los proyectos vinculados al usuario
+                $subquery->select('id_categoria')
+                    ->from('proyecto')
+                    ->where(function($q) use ($id_usuario) {
+                        $q->where('id_docente_lider', $id_usuario)
+                        ->orWhere('id_docente_director', $id_usuario)
+                        ->orWhere('id_usuario', $id_usuario)
+                        ->orWhereExists(function ($p) use ($id_usuario) {
+                            $p->select(DB::raw(1))
+                                ->from('participantes_proyecto')
+                                ->whereColumn('participantes_proyecto.id_proyecto', 'proyecto.id_proyecto')
+                                ->where('participantes_proyecto.id_usuario', $id_usuario);
+                        });
+                    });
+            })
+            // Opcional: Mostrar también eventos que no tienen categoría asignada (Institucionales)
+            ->orWhereNull('id_categoria'); 
+        })
+        ->where('fecha_evento', '>=', $fechaActual)
+        ->orderBy('fecha_evento', 'asc')
+        ->get();    
+            
+
         // Otros datos globales
         $estudiantes = Usuarios::role('Estudiante')->count();
         $totalProyectosGeneral = Proyecto::count();
@@ -112,7 +140,7 @@ class DashboardController extends Controller
             'totalProyectos', 'proyectosActivos', 'proyectosFinalizados', 'proyectosAtrasados',
             'proyectosAvalados', 'totalTareas', 'totalAsignadas', 'totalEntregadas', 'totalCorregidas',
             'totalFinalizadas', 'participacion', 'totalProyectosGeneral', 'estudiantes',
-            'versiones', 'porcentajeProyecto', 'tareas'
+            'versiones', 'porcentajeProyecto', 'tareas', 'eventos'
         ));
     }
 
@@ -125,6 +153,7 @@ class DashboardController extends Controller
         // Si es administrador, dejamos el ID en null para no filtrar
         $esAdmin = $user->hasRole('Administrador'); 
         $id_docente = $esAdmin ? null : $user->id_usuario;
+        $id_usuario = $user->id_usuario;
 
 
         $totalProyectos = Proyecto::count();
@@ -232,6 +261,30 @@ class DashboardController extends Controller
                 return $proyecto;
         });
 
+        $eventos = Eventos::when(!$esAdmin, function ($query) use ($id_usuario) {
+            return $query->whereIn('id_categoria', function($subquery) use ($id_usuario) {
+                // Seleccionamos los IDs de categorías de los proyectos vinculados al usuario
+                $subquery->select('id_categoria')
+                    ->from('proyecto')
+                    ->where(function($q) use ($id_usuario) {
+                        $q->where('id_docente_lider', $id_usuario)
+                        ->orWhere('id_docente_director', $id_usuario)
+                        ->orWhere('id_usuario', $id_usuario)
+                        ->orWhereExists(function ($p) use ($id_usuario) {
+                            $p->select(DB::raw(1))
+                                ->from('participantes_proyecto')
+                                ->whereColumn('participantes_proyecto.id_proyecto', 'proyecto.id_proyecto')
+                                ->where('participantes_proyecto.id_usuario', $id_usuario);
+                        });
+                    });
+            })
+            // Opcional: Mostrar también eventos que no tienen categoría asignada (Institucionales)
+            ->orWhereNull('id_categoria'); 
+        })
+        ->where('fecha_evento', '>=', $fechaActual)
+        ->orderBy('fecha_evento', 'asc')
+        ->get();
+
 
 
         // Retorna un ARRAY directo, no un response()->json()
@@ -252,7 +305,8 @@ class DashboardController extends Controller
             'tareas'               => $tareas,
             'listarProyectos'      => Proyecto::where('id_docente_lider', $id_docente),
             'versiones'            => $versiones,
-            'porcentajeProyecto'   => $porcentajeProyecto
+            'porcentajeProyecto'   => $porcentajeProyecto,
+            'eventos'              => $eventos
         ];
     }
 

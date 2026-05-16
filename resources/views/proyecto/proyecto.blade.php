@@ -179,18 +179,20 @@
                             <select  class="form-select form-select-solid" data-placeholder="Seleccione una categoria" name="id_categoria" id="id_categoria"></select>
                         </div>
                         <div class="mb-3">
-                        <label class="fs-6 fw-semibold mb-2 required">Estudiantes participantes</label>
-                        <div class="border p-2 rounded d-flex flex-wrap align-items-center" style="min-height: 45px; background-color: #f5f8fa;">
-                            <div v-for="(correo, index) in colaboradores" :key="index" class="badge badge-secondary m-1 p-2 d-flex align-items-center">
-                            @{{ correo }}
-                            <span @click="eliminarColaborador(index)" class="ms-2 cursor-pointer text-danger">&times;</span>
+                            <label class="fs-6 fw-semibold mb-2">Estudiantes participantes</label>
+                            <div class="border p-2 rounded d-flex flex-wrap align-items-center" style="min-height: 45px; background-color: #f5f8fa;">
+                                <div v-for="(correo, index) in colaboradores" :key="index" class="badge badge-secondary m-1 p-2 d-flex align-items-center">
+                                    @{{ correo }}
+                                    <span @click="eliminarColaborador(index)" class="ms-2 cursor-pointer text-danger">&times;</span>
+                                </div>
+                                <input type="email" v-model="nuevo_correo" @keydown.enter.prevent="agregarColaborador" 
+                                    class="border-0 bg-transparent flex-grow-1" 
+                                    placeholder="Escribe un correo y pulsa Enter"
+                                    style="outline: none;">
                             </div>
-                            <input type="email" v-model="nuevo_correo"  @keydown.enter.prevent="agregarColaborador" 
-                            class="border-0 bg-transparent flex-grow-1" 
-                            placeholder="Escribe un correo y pulsa Enter"
-                            style="outline: none;">
-                        </div>
-                            <small class="text-muted">Los usuarios que no existan serán invitados automáticamente.</small>
+                            <small class="text-muted">
+                                Solo se pueden agregar estudiantes que ya tengan una cuenta activa.
+                            </small>
                         </div>
                         <input type="hidden" name="correo_usuario" id="correo_usuarios_hidden">
                     </div>

@@ -69,25 +69,20 @@ class ProyectoController extends Controller
             if (!empty($request->colaboradores)) {
                 foreach ($request->colaboradores as $correo) {
                     
-                    // A. Buscar o crear el usuario invitado
-                    $usuario = Usuarios::firstOrCreate(
-                        ['correo_usuario' => $correo],
-                        [
-                            'nombre_usuario'   => 'Invitado',
-                            'apellido_usuario' => 'Pendiente',
-                            'id_rol'           => 2, 
-                            'cedula_usuario'   => '000' . rand(1000, 9999),
-                            'password'         => bcrypt('123456')
-                        ]
-                    );
+                    // Buscamos al usuario por correo
+                    $usuario = Usuarios::where('correo_usuario', $correo)->first();
 
-                    // B. Insertar en tabla pivote (SOLO IDs)
+                    // SI NO EXISTE: Lanzamos excepción para cancelar todo el proceso
+                    if (!$usuario) {
+                        throw new \Exception("El colaborador con correo '{$correo}' no está registrado en el sistema.");
+                    }
+
+                    // SI EXISTE: Insertamos en la tabla pivote
                     DB::table('sgp.participantes_proyecto')->insert([
-                        'id_usuario'  => $usuario->id_usuario,
-                        'id_proyecto' => $proyecto->id_proyecto,
-                        'creado_en'  => now(),
-                        'actualizado_en'  => now()
-                        
+                        'id_usuario'     => $usuario->id_usuario,
+                        'id_proyecto'    => $proyecto->id_proyecto,
+                        'creado_en'      => now(),
+                        'actualizado_en' => now()
                     ]);
                 }
             }
@@ -99,8 +94,8 @@ class ProyectoController extends Controller
                 'tipo_notificacion'         => 'proyecto',
                 'id_referencia'             => $proyecto->id_proyecto,
                 'titulo_notificacion'       => 'Proyecto registrado',
-                'descripcion_notificacion'  => "El estudiante ha realizado el registro del proyecto:". ($proyecto->nombre_proyecto ?? 'Sin nombre'),
-                'url_notificacion'          => "/detalle/{$proyecto->id_proyecto}", +
+                'descripcion_notificacion'  => "El estudiante ha realizado el registro del proyecto: ". ($proyecto->nombre_proyecto ?? 'Sin nombre'),
+                'url_notificacion'          => "/detalle/{$proyecto->id_proyecto}", 
                 'leida'                     => 0 
             ]); 
 
@@ -226,7 +221,9 @@ class ProyectoController extends Controller
     //Listar proyectos para los roles de Docente director y docente lider.
     public function listarProyecto(Request $request){
 
-        $proyectos = Proyecto::with(['categoria']);
+        $id_docente = auth()->id();
+
+        $proyectos = Proyecto::where('id_docente_director', $id_docente)->Orwhere('id_docente_lider', $id_docente)->with(['categoria']);
         
         return DataTables::eloquent($proyectos)
             ->addColumn('nombre_proyecto', fn($c) => $c->nombre_proyecto ?? 'Sin proyecto')
@@ -336,5 +333,56 @@ class ProyectoController extends Controller
         }
     }
 
-    
+    public function validarCorreo($correo)
+    {
+        $usuario = Usuarios::where('correo_usuario', $correo)->first();
+
+        if (!$usuario) {
+            return response()->json(['error' => 'No existe'], 404);
+        }
+
+        return response()->json(['success' => true], 200);
+    }
+
+    public function selectListarDocentesDirector(Request $request)
+    {
+        $proyecto = Proyecto::findOrFail($request->id_proyecto);
+
+        $docentes = Usuarios::whereIn('id_usuario', function ($query) use ($proyecto) {
+
+            $query->select('id_docente_director')
+                ->from('categoria_docente_responsable')
+                ->where('id_categoria', $proyecto->id_categoria);
+        })->get();
+
+        return response()->json($docentes, 200);
+    }
+
+    public function selectListarDocentesLider(Request $request)
+    {
+        $proyecto = Proyecto::findOrFail($request->id_proyecto);
+
+        $docentes = Usuarios::whereIn('id_usuario', function ($query) use ($proyecto) {
+
+            $query->select('id_docente_lider')
+                ->from('categoria_docente_responsable')
+                ->where('id_categoria', $proyecto->id_categoria);
+        })->get();
+
+        return response()->json($docentes, 200);
+    }
+
+    public function reasignarDocente(Request $request){
+
+        $proyecto = Proyecto::findOrFail($request->id_proyecto);
+        $proyecto->id_docente_director = $request->id_docente_director;
+        $proyecto->id_docente_lider = $request->id_docente_lider;
+
+        $proyecto->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Docentes reasignados correctamente'
+        ]);
+    }
 }

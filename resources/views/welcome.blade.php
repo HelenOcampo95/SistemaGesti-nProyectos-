@@ -253,17 +253,17 @@
                                             <span class="menu-icon">
                                                 <i class="fa-solid fa-list-check"></i>
                                             </span>
-                                            <span class="menu-title">Tareas</span>
+                                            <span class="menu-title">Actividades</span>
                                         </a>
                                     </div>
                                 @endrole
-                                @role(['Administrador'])
+                                @role(['Administrador', 'Docente Director'])
                                     <div class="menu-item">
-                                        <a class="menu-link" href="#">
+                                        <a class="menu-link" href="{{('eventos')}}">
                                             <span class="menu-icon">
                                                 <i class="bi bi-people-fill fs-3"></i>
                                             </span>
-                                            <span class="menu-title">Registrarme</span>
+                                            <span class="menu-title">Eventos</span>
                                         </a>
                                     </div>  
                                 @endrole

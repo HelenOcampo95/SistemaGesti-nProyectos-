@@ -40,7 +40,73 @@ const appProyectos = createApp({
     
 
     mounted() {
-    
+        $('#id_docente_director').select2({
+            dropdownParent: $('#modal_reasignar_docente'),
+            ajax: {
+                url: '/select-docentes-director',
+                dataType: 'json',
+                type: 'get',
+                delay: 300,
+                language: 'es',
+
+                data: params => {
+                    return {
+                        busqueda: params.term,
+                        page: params.page,
+                        id_proyecto: $('#id_proyecto').val()
+                    }
+                },
+
+                processResults: data => {
+
+                    let results = [];
+
+                    $.each(data, function(index, item) {
+                        results.push({
+                            id: item.id_usuario,
+                            text: `${item.nombre_usuario} ${item.apellido_usuario}`
+                        })
+                    });
+
+                    return { results }
+                },
+
+                cache: true
+            },
+        });
+
+        $('#id_docente_lider').select2({
+            dropdownParent: $('#modal_reasignar_docente'),
+            ajax: {
+                url: '/select-docentes-lider',
+                dataType: 'json',
+                type: 'get',
+                delay: 300,
+                language: 'es',
+                data: params => {
+                    return {
+                        busqueda: params.term,
+                        page: params.page,
+                        id_proyecto: $('#id_proyecto').val()
+                    }
+                },
+                processResults: data => {
+
+                    let results = [];
+
+                    $.each(data, function(index, item) {
+                        results.push({
+                            id: item.id_usuario,
+                            text: `${item.nombre_usuario} ${item.apellido_usuario}`
+                        })
+                    })
+
+                    return { results }
+                },
+                cache: true
+            },
+
+        });
     },
     computed:{
         excedidos(){
@@ -251,6 +317,51 @@ const appProyectos = createApp({
             .finally( () => {
                 desactivarLoadBtn('btn_registrar_version');
             })
+        },
+        reasignarDocente() {
+
+            let id_proyecto = $('#id_proyecto').val();
+            let id_docente_director = $('#id_docente_director').val();
+            let id_docente_lider = $('#id_docente_lider').val();
+
+            activarLoadBtn('btn_reasignar_docente');
+
+            const datos = {
+                id_proyecto: id_proyecto,
+                id_docente_director: id_docente_director,
+                id_docente_lider: id_docente_lider
+            };
+
+            axios.post('/reasignarDocente', datos)
+
+                .then(response => {
+
+                    Swal.fire(
+                        '¡Éxito!',
+                        'Los docentes fueron reasignados con éxito',
+                        'success'
+                    ).then(() => window.location.reload());
+
+                })
+
+                .catch(error => {
+
+                    console.error(error);
+
+                    Swal.fire(
+                        'Error',
+                        'No se pudo reasignar el docente',
+                        'error'
+                    );
+
+                })
+
+                .finally(() => {
+
+                    desactivarLoadBtn('btn_reasignar_docente');
+
+                });
+
         }
     }
 

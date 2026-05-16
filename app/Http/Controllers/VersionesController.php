@@ -23,11 +23,47 @@ class VersionesController extends Controller
         DB::beginTransaction();
 
         try {
-            $version = Versiones::findOrFail($id_version);
+            $version = Versiones::with('proyecto')->findOrFail($id_version);
             $version->estado_version = Versiones::ACEPTADA;
             $version->save();
 
+            $proyecto = $version->proyecto;
+
+            // 1. Empezamos con el ID del dueño
+            $todosLosUsuarios = collect([$proyecto->id_usuario]);
+
+            // 2. Buscamos participantes. Si no hay ninguno, pluck() devuelve una colección vacía.
+            $participantesIds = DB::table('sgp.participantes_proyecto')
+                ->where('id_proyecto', $proyecto->id_proyecto)
+                ->pluck('id_usuario');
+
+            // 3. Unimos las listas. Si $participantesIds está vacío, no afecta en nada.
+            $todosLosUsuarios = $todosLosUsuarios->concat($participantesIds)->unique()->filter();
+
             DB::commit();
+
+            // 4. Notificar a los que existan en la colección (Dueño + Participantes si hay)
+            foreach ($todosLosUsuarios as $idUsuario) {
+                $notificacion = \App\Models\Notificacion::create([
+                    'id_usuario'               => $idUsuario,
+                    'tipo_notificacion'        => 'Version',
+                    'id_referencia'            => $version->id_version,
+                    'titulo_notificacion'      => 'Versión aprobada',
+                    'descripcion_notificacion' => "El docente ha aprobado la versión del proyecto: " . ($proyecto->nombre_proyecto ?? 'Sin nombre'),
+                    'url_notificacion'         => "/aceptar-version/{$proyecto->id_proyecto}", 
+                    'leida'                    => 0 
+                ]); 
+
+                event(new NotificacionUsuario($notificacion));
+                
+                $DashboardController = new DashboardController();
+                $data = $DashboardController->obtenerDashboardData($idUsuario);
+
+                $dataLimpia = json_decode(json_encode($data), true); 
+
+                event(new DashboardUpdated($dataLimpia));
+            }
+
             return back()->with('success', 'Versión actualizada correctamente');
 
         } catch (\Exception $e) {
@@ -44,7 +80,40 @@ class VersionesController extends Controller
             $version->estado_version = Versiones::RECHAZADA;
             $version->save();
 
+            $proyecto = $version->proyecto;
+
+            // 1. Empezamos con el ID del dueño
+            $todosLosUsuarios = collect([$proyecto->id_usuario]);
+
+            // 2. Buscamos participantes. Si no hay ninguno, pluck() devuelve una colección vacía.
+            $participantesIds = DB::table('sgp.participantes_proyecto')
+                ->where('id_proyecto', $proyecto->id_proyecto)
+                ->pluck('id_usuario');
+
+            // 3. Unimos las listas. Si $participantesIds está vacío, no afecta en nada.
+            $todosLosUsuarios = $todosLosUsuarios->concat($participantesIds)->unique()->filter();
+
             DB::commit();
+
+            // 4. Notificar a los que existan en la colección (Dueño + Participantes si hay)
+            foreach ($todosLosUsuarios as $idUsuario) {
+                $notificacion = \App\Models\Notificacion::create([
+                    'id_usuario'               => $idUsuario,
+                    'tipo_notificacion'        => 'Version',
+                    'id_referencia'            => $version->id_version,
+                    'titulo_notificacion'      => 'Versión rechazada',
+                    'descripcion_notificacion' => "El docente ha rechazado la versión del proyecto: " . ($proyecto->nombre_proyecto ?? 'Sin nombre'),
+                    'url_notificacion'         => "/rechazar-version/{$proyecto->id_proyecto}", 
+                    'leida'                    => 0 
+                ]); 
+                
+                event(new NotificacionUsuario($notificacion));
+
+                $DashboardController = new DashboardController();
+                $data = $DashboardController->obtenerDashboardData($idUsuario);
+
+                $dataLimpia = json_decode(json_encode($data), true); 
+            }
             return back()->with('success', 'Versión actualizada correctamente');
 
         } catch (\Exception $e) {

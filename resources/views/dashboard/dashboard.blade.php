@@ -206,7 +206,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="mb-5 ps-1">
+            <div class="mb-8 ps-1">
                 <h3 class="fw-bolder text-gray-800 fs-4 mb-0">Panorama Institucional</h3>
                 <span class="text-muted fw-semibold fs-8 text-uppercase tracking-tight">Métricas de Impacto y Agenda 2026</span>
             </div>
@@ -272,29 +272,34 @@
             </div>
 
             <div class="d-flex justify-content-start">
-                <div class="card border-0 shadow-sm w-75" style="border-radius: 16px; min-width: 520px;">
+                <div class="card border-0 shadow-sm w-75" style="border-radius: 16px; min-width: 595px;">
                     <div class="card-body p-5">
                         <div class="d-flex align-items-center mb-4 text-primary">
                             <i class="bi bi-calendar-event-fill me-2"></i>
                             <h3 class="fw-bolder text-gray-800 fs-8 m-0">Agenda Próxima</h3>
                         </div>
                         
-                        <div class="d-flex align-items-center mb-4">
-                            <div class="w-4px h-30px bg-primary rounded-pill me-3"></div>
-                            <div class="d-flex flex-column">
-                                <span class="text-gray-800 fw-bold fs-8 lh-1 mb-1">Feria de Semilleros</span>
-                                <span class="text-muted fs-9">12 Mar • Presencial</span>
+                        <div class="scroll-y me-n5 pe-5 h-125px">
+                            @forelse ($eventos as $evento)
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="w-4px h-30px bg-primary rounded-pill me-3"></div>
+                                <div class="d-flex flex-column">
+                                    <span class="text-gray-800 fw-bold fs-8 lh-1 mb-1">{{$evento->nombre_evento}}</span>
+                                    <span class="text-muted fs-9">{{ \Carbon\Carbon::parse($evento->fecha_evento)->translatedFormat('d M, Y') }} • {{$evento->modalidad_evento}}</span>
+                                    <span class="text-muted fs-9">
+                                        <a href="{{$evento->ubicacion_url}}">{{$evento->ubicacion_url}}</a>
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="d-flex align-items-center">
-                            <div class="w-4px h-30px bg-danger rounded-pill me-3"></div>
-                            <div class="d-flex flex-column">
-                                <span class="text-gray-800 fw-bold fs-8 lh-1 mb-1">Cierre Convocatoria</span>
-                                <span class="text-muted fs-9">05 Abr • Virtual</span>
-                            </div>
-                        </div>
-                    </div>
+                            @empty
+                                    <div class="text-center py-10">
+                                        <div class="d-flex flex-column justify-content-center">
+                                            <span class="text-gray-400 fw-bold fs-6">Aún no hay eventos en curso</span>
+                                        </div>
+                                    </div>
+                            @endforelse
+                        
+                        </div> </div>
                 </div>
             </div>
         </div>

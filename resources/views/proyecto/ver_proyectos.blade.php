@@ -24,13 +24,6 @@
 							</ul>
 						<!--end::Breadcrumb-->
 					</div>
-					<!--end::Page title-->
-					<!--begin::Actions-->
-					{{-- <div class="d-flex align-items-center gap-2 gap-lg-3">
-						<a href="#" class="btn btn-sm fw-bold btn-success" data-bs-toggle="modal" data-bs-target="#modal_registrar_categoria">Crear categoria</a>
-						<!--end::Primary button-->
-					</div> --}}
-					<!--end::Actions-->
 				</div>
 			<!--end::Toolbar container-->
 			</div>

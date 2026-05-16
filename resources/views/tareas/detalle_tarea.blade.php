@@ -17,7 +17,7 @@
 						</div>
 							<ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
 								<li class="breadcrumb-item text-muted">
-									<a href="../../demo1/dist/index.html" class="text-muted text-hover-primary">Información de la tarea</a>
+									<a href="../../demo1/dist/index.html" class="text-muted text-hover-primary">Información de la actividades</a>
 								</li>
 							</ul>
 					</div>
@@ -154,7 +154,7 @@
         <div class="modal-content" id="registrar_proyecto">
             <form class="form" id="formulario_registrar_proyecto">
                 <div class="modal-header">
-                    <h2 class="fw-bold">Tarea</h2>
+                    <h2 class="fw-bold">Actividad</h2>
                     <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
                         <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
                     </div>
@@ -179,53 +179,7 @@
 							</div>
                         </div>
                     </div>
-					<div class="form-check form-switch mb-5">
-						<input 
-							class="form-check-input" 
-							type="checkbox" 
-							id="toggleVersion" 
-							v-model="mostrarFormVersion"
-						>
-						<label class="form-check-label fw-bold" for="toggleVersion">
-							¿Registrar nueva versión?
-						</label>
-					</div>
-
-					<transition name="fade">
-						<div v-if="mostrarFormVersion" class="card bg-light-primary border-dashed p-5 mb-5">
-							<div class="row g-3">
-								<div class="col-md-4">
-									<input v-model="nuevaVersion.tag" 
-									:class="{'border-danger': excedidos.version}"
-									:maxlength="limites.tag" 
-									type="text" class="form-control form-control-sm" 
-									placeholder="v1.0.0">
-									<div class="d-flex justify-content-between mt-2">
-										<small v-if="excedidos.version" class="text-danger">
-											Límite máximo alcanzado
-										</small>
-									</div>
-								</div>
-								<div class="col-md-8">
-									<input v-model="nuevaVersion.descripcion_cambios" 
-									type="text" 
-									class="form-control form-control-sm" 
-									placeholder="Descripción de cambios"
-									v-model="nuevaVersion.descripcion_cambios"
-									:class="{'border-danger': excedidos.descripcion}"
-									:maxlength="limites.descripcion_cambios">
-									<div class="d-flex justify-content-between mt-2">
-										<small v-if="excedidos.descripcion" class="text-danger">
-											Límite máximo alcanzado
-										</small>
-									</div>
-								</div>
-								
-							</div>
-						</div>
-					</transition>
                 </div>
-
                 <div class="modal-footer flex-center">
                     <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal">Cerrar</button>
                     <button type="button" id="btn_crear_proyecto" class="btn btn-success" @click.prevent="entregarTarea">
@@ -251,7 +205,7 @@
                 <div class="modal-body py-10 px-lg-17">
 					<div class="row g-9 mb-8">
 						<div class="col-md-8 fv-row">
-							<label class="required fs-6 fw-bold mb-2">Estado de la Tarea</label>
+							<label class="required fs-6 fw-bold mb-2">Estado de la actividad</label>
 							<select name="estado_tarea" id="estado_tarea" class="form-select form-select-solid" data-control="select2" data-hide-search="true">
 								@foreach($estados as $estado)
 									<option value="{{ $estado }}" {{ $tarea->estado_tarea == $estado ? 'selected' : '' }}>

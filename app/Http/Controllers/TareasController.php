@@ -187,25 +187,6 @@ class TareasController extends Controller
         $tarea->intentos_realizados += 1;
         $tarea->save();
 
-        if ($request->es_version) {
-            $version = Versiones::where('id_proyecto', $tarea->id_proyecto)
-                                ->where('archivos_relacionados', $tarea->url_tarea) 
-                                // O mejor aún, si tienes una columna id_tarea en versiones, úsala.
-                                ->first();
-
-            if (!$version) {
-                $version = new Versiones();
-                $version->id_proyecto = $tarea->id_proyecto;
-            }
-
-            $version->version               = $request->tag;
-            $version->descripcion_cambios   = $request->descripcion_cambios;
-            $version->fecha_modificacion    = now();
-            $version->archivos_relacionados = $request->url_tarea;
-            $version->estado_version        = VERSIONES::PENDIENTE; 
-            $version->save();
-        }
-
         $idDocente = $tarea->proyecto->id_docente_lider;
 
         $notificacion = \App\Models\Notificacion::create([

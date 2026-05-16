@@ -3,6 +3,7 @@
 use App\Http\Controllers\AutenticacionController;
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EventosController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\TareasController;
@@ -62,14 +63,17 @@ Route::middleware('permisos:Crear_proyecto')->group( function() {
     //Proyecto
     Route::post('/proyectos', [ProyectoController::class, 'registrarProyecto']);
 });
-    Route::get('/ver-proyecto',[ProyectoController::class, 'verProyecto'])->name('proyecto');
-    Route::get('/detalle/{id_proyecto}', [ProyectoController::class, 'detalleProyecto'])->name('detalle');
-    Route::post('/actualizar-proyecto', [ProyectoController::class, 'actualizarProyecto'])->name('proyecto.actualizar');
-    Route::get('/select-proyecto', [ProyectoController::class, 'selectProyecto']);
-    Route::post('/vincular-estudiante', [ProyectoController::class, 'vincularEstudiante']);
-    Route::post('/finalizar-proyecto/{id_proyecto}', [ProyectoController::class, 'finalizarProyecto']);
-    Route::post('/avalar-proyecto/{id_proyecto}', [ProyectoController::class, 'avalarProyecto']);
-
+Route::get('/ver-proyecto',[ProyectoController::class, 'verProyecto'])->name('proyecto');
+Route::get('/detalle/{id_proyecto}', [ProyectoController::class, 'detalleProyecto'])->name('detalle');
+Route::post('/actualizar-proyecto', [ProyectoController::class, 'actualizarProyecto'])->name('proyecto.actualizar');
+Route::get('/select-proyecto', [ProyectoController::class, 'selectProyecto']);
+Route::post('/vincular-estudiante', [ProyectoController::class, 'vincularEstudiante']);
+Route::post('/finalizar-proyecto/{id_proyecto}', [ProyectoController::class, 'finalizarProyecto']);
+Route::post('/avalar-proyecto/{id_proyecto}', [ProyectoController::class, 'avalarProyecto']);
+Route::get('/validar-correo/{correo}', [ProyectoController::class, 'validarCorreo']);
+Route::get('/select-docentes-director', [ProyectoController::class, 'selectListarDocentesDirector']);
+Route::get('/select-docentes-lider', [ProyectoController::class, 'selectListarDocentesLider']);
+Route::post('/reasignarDocente', [ProyectoController::class, 'reasignarDocente']);
 
 //Listar todos los proyectos para lideres y directores
 Route::get('/ver-proyectos', [ProyectoController::class, 'verListadoProyecto'])->name('listarProyectos');
@@ -93,8 +97,6 @@ Route::get('/usuarios/select-usuarios', [ProyectoController::class, 'traerUsuari
 Route::get('/docentes/select-docentes-director', [CategoriasController::class, 'selectListarDocentesDirector']);
 Route::get('/docentes/select-docentes-lider', [CategoriasController::class, 'selectListarDocentesLider']);
 
-
-
 Route::post('/asignar-tarea', [TareasController::class, 'asignarTarea' ]);
 Route::get('/listar-tareas', [TareasController::class, 'listarTareas']);
 Route::post('/eliminar-tarea/{id_tarea}', [TareasController::class, 'eliminarTarea']);
@@ -111,6 +113,13 @@ Route::post('/registrar-version/{id_proyecto}', [VersionesController::class, 're
 Route::get('/notificaciones/listar', [NotificacionController::class, 'getNotificaciones']);
 Route::post('/notificaciones/leer/{id}', [NotificacionController::class, 'marcarComoLeida']);
 
+Route::get('/eventos', [EventosController::class, 'verEventos'])->name('eventos');
+Route::post('/registrar-evento', [EventosController::class, 'registrarEvento']);
+Route::get('/seleccionar-categoria', [EventosController::class, 'verCategorias']);
+
+Route::get('/listar-evento', [EventosController::class, 'listaEventos']);
+Route::post('/actualizar-evento/{id_evento}', [EventosController::class, 'actualizarEvento'] );
+Route::post('/eliminar-evento/{id_evento}', [EventosController::class, 'eliminarEvento']);
 });
 
 /** Logout (POST, protegido) */
