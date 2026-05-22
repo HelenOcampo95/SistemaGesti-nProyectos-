@@ -60,14 +60,14 @@ const appCategorias = createApp({
                 { data: "porcentaje_avance", name: "porcentaje_avance"},
                 { 
                     data: "actualizado_en", 
-                    name: "actualizado_en", // Corregido: El name debe coincidir con el data
+                    name: "actualizado_en",
                     render: function(data) { 
                         return self.formatarFechaHora(data); 
                     }
                 },
                 { 
                     data: "eliminado_en", 
-                    name: "eliminado_en", // Corregido: El name debe coincidir con el data
+                    name: "eliminado_en", 
                     render: function(data) { 
                         return self.formatarFechaHora(data); 
                     }
@@ -75,7 +75,6 @@ const appCategorias = createApp({
                 { 
                     data: "id_tarea", 
                     render: function(data, type, row) {
-                        // 1. Iniciamos con el botón de "Ver Detalle" (que todos ven)
                         let html = `
                             <div class="dropdown">
                                 <button class="btn btn-sm btn-light-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -353,7 +352,7 @@ const appCategorias = createApp({
 
             editarTarea(){
                 // Obtenemos los datos del formulario de edición
-                const id_tarea = $('#id_tarea_editar').val(); 
+                const id_tarea = $('#id_tarea_editar_hidden').val(); 
                 const titulo_tarea = $('#titulo_tarea_editar').val();
                 const descripcion_tarea = $('#descripcion_tarea_editar').val();
                 const observaciones_docente = $('#observaciones_tarea_editar').val();

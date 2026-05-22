@@ -5,7 +5,7 @@
         @csrf
 
         <div class="text-center">
-            <img src="../assets/images/logo/areandina.png" alt="Areandina" width="250" height="150">
+            <img src="../assets/images/logo/areandina.png" alt="Areandina" width="400" height="150">
             <h1 class="text-dark mb-3">Crear cuenta</h1>
         </div>
 

@@ -68,18 +68,24 @@ class TareasController extends Controller
 
     public function listarTareas(Request $request)
     {
-        $tareas = Tareas::with('proyecto')->whereHas('proyecto', function($query) {
-            $query->where('id_docente_lider', auth()->id())
-            ->orWhere('id_docente_director',auth()->id()); 
-        });
+        $queryTareas = Tareas::with('proyecto');
 
-        return DataTables::eloquent($tareas)
+        // 2. Aplicamos restricción por rol (Si NO es administrador, filtramos por sus proyectos)
+        // Cambia 'admin' por el nombre exacto de tu rol o la lógica que uses para verificarlo
+        if (!auth()->user()->hasRole('Administrador')) { 
+            $queryTareas->whereHas('proyecto', function($query) {
+                $query->where(function($q) {
+                    $q->where('id_docente_lider', auth()->id())
+                    ->orWhere('id_docente_director', auth()->id());
+                });
+            });
+        }
+
+        return DataTables::eloquent($queryTareas)
             ->addColumn('nombre_proyecto', fn($c) => $c->proyecto->nombre_proyecto ?? 'Sin proyecto')
             ->addColumn('titulo_tarea', fn($c) => $c->titulo_tarea ?? 'Sin título')
             ->addColumn('descripcion_tarea', fn($c) => $c->descripcion_tarea ?? 'Sin descripción')
-            ->addColumn('fecha_entrega', fn($c) => $c->fecha_entrega ?? 'Sin fechas')
             ->addColumn('estado_tarea', fn($c) => $c->estado_tarea ?? 'Sin estado')
-            ->addColumn('observaciones_docente', fn($c) => $c->observaciones_docente ?? 'Sin observaciones')
             ->filter(function ($query) use ($request) {
                 $buscar = $request->input('buscar');
                 if (!empty($buscar)) {

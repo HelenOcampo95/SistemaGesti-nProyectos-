@@ -153,23 +153,63 @@
                 <input type="hidden" id="id_evento_actualizar" name="id_evento">
 
                 <div class="modal-header" id="header_editar_categoria">
-                    <h2 class="fw-bold">Editar facultad</h2>
+                    <h2 class="fw-bold">Editar Evento</h2>
                     <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal" aria-label="Close">
                         ✖
                     </div>
                 </div>
                 <div class="modal-body py-10 px-lg-17">
                     <div class="mb-5 fv-row">
-                        <label class="fs-6 fw-semibold mb-2 required">Nombre de la categoria</label>
+                        <label class="fs-6 fw-semibold mb-2 required">Nombre del evento</label>
                         <input type="text" class="form-control form-control-solid" 
                             id="nombre_evento_editar" 
                             name="nombre_evento"
 							v-model="formEvento.editarEvento">
                     </div>
+                    <div class="row g-9 mb-8">
+						<div class="col-md-6 fv-row">
+                            <label class="fs-6 fw-semibold mb-2 required" >Fecha evento</label>
+                            <input type="text" class="form-control form-control-solid" 
+                            id="fecha_evento_editar" 
+                            name="fecha_evento" 
+                            v-model="formEvento.editarFechaEvento" />
+						</div>
+							<div class="col-md-6 fv-row">
+								<label class="fs-6 fw-semibold mb-2 required" >Hora evento</label>
+								<input type="text"
+								class="form-control form-control-solid" 
+								id="hora_evento_editar" 
+								name="hora_evento" 
+								v-model="formEvento.editarHoraEvento"/>
+						</div>
+					</div>
+                    <div class="mb-5 fv-row mb-7">
+					<label class="fs-6 fw-semibold mb-2">Modalidad</label>
+						<select
+							class="form-select form-select-solid"
+							name="modalidad_evento"
+							id="modalidad_evento_editar"
+							v-model="formEvento.editarModalidad"
+							data-control="select2"
+							data-hide-search="true"
+							data-placeholder="Seleccione estado">
+				
+							<option value="virtual">Virtual</option>
+							<option value="presencial">Presencial</option>
+
+						</select>
+					</div>
+                    <div class="mb-5 fv-row">
+                        <label class="fs-6 fw-semibold mb-2 required">Ubicación evento</label>
+                        <input type="text" class="form-control form-control-solid" 
+                            id="ubicacion_evento_editar" 
+                            name="ubicacion_url"
+							v-model="formEvento.editarUbicacion">
+                    </div>
                 </div>
                 <div class="modal-footer flex-center">
                     <button type="button" id="btn_editar_categoria" class="btn btn-success" @click.prevent="editarEvento">
-                        <span class="indicator-label">Editar Categoria</span>
+                        <span class="indicator-label">Editar Evento</span>
                         <span class="indicator-progress">Por favor espere...
                             <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
                         </span>

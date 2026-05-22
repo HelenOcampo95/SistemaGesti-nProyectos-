@@ -485,6 +485,7 @@
 												rows="4">
 											</textarea>
 										</div>
+										@can('campos_deshabilitados') {{--Datos deshabilitados para el estudiante --}}
 										<div class="row g-9 mb-8">
 											<div class="col-md-6 fv-row">
 												<label class="fs-6 fw-semibold mb-2 required" >Fecha inicio</label>
@@ -513,14 +514,59 @@
 											v-model="formProyecto.estado_proyecto" disabled/>
 										</div>
 										<div class="mb-5 fv-row mb-7">
-											<label class="fs-6 fw-semibold mb-2 ">Categoría</label>
-											<input type="text" class="form-control form-control-solid" 
-											v-model="formProyecto.nombre_categoria" disabled>
+											<label class="fs-6 fw-semibold mb-2">Categoría</label>
+											<select
+												id="id_categoria_editar"
+												name="id_categoria"
+												class="form-select form-select-solid" disabled>
+											</select>
+										</div>
+										@endcan
+										@can('campos_habilitados')
+										<div class="row g-9 mb-8">
+											<div class="col-md-6 fv-row">
+												<label class="fs-6 fw-semibold mb-2 required" >Fecha inicio</label>
+												<input type="text" class="form-control form-control-solid" 
+												id="fecha_inicio" 
+												name="fecha_inicio" 
+												v-model="formProyecto.fecha_inicio"/>
+											</div>
+											<div class="col-md-6 fv-row">
+												<label class="fs-6 fw-semibold mb-2 required" >Fecha entrega</label>
+												<input type="text"
+												class="form-control form-control-solid" 
+												id="fecha_entrega" 
+												name="fecha_entrega" 
+												v-model="formProyecto.fecha_entrega" />
+											</div>
+										</div>
+										<div class="mb-5 fv-row mb-7">
+											<label class="fs-6 fw-semibold mb-2">Estado</label>
+											<select
+												class="form-select form-select-solid"
+												name="estado_proyecto"
+												id="estado_proyecto"
+												v-model="formProyecto.estado_proyecto"
+												data-control="select2"
+												data-hide-search="true"
+												data-placeholder="Seleccione estado">
 
-												<!-- Enviar el id al backend -->
-											<input type="hidden" name="id_categoria" value="{{ $proyecto->id_categoria }}">
+												
+												<option value="Activo">Activo</option>
+												<option value="Inactivo">Inactivo</option>
+
+											</select>
 										</div>
+										<div class="mb-5 fv-row mb-7">
+											<label class="fs-6 fw-semibold mb-2">Categoría</label>
+											<select
+												id="id_categoria_editar"
+												name="id_categoria"
+												class="form-select form-select-solid">
+											</select>
 										</div>
+										@endcan
+									</div>
 							</div>
 							<div class="modal-footer flex-center">
 								<button type="button" id="btn_editar_proyecto" class="btn btn-success" @click.prevent="actualizarProyecto(proyecto)">

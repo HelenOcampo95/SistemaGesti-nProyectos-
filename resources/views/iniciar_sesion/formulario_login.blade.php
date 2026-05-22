@@ -4,7 +4,7 @@
 <form class="form w-100" id="form_iniciar_sesion" novalidate>
     <!-- Encabezado -->
     <div class="text-center mb-11">
-        <img src="../assets/images/logo/areandina.png" alt="Areandina" width="250" height="150">
+        <img src="../assets/images/logo/areandina.png" alt="Areandina" width="300" height="150">
         <h1 class="text-dark fw-bolder mt-3 text-dark--login">Iniciar sesión</h1>
     </div>
 

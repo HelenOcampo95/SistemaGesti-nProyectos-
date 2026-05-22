@@ -16,11 +16,16 @@ const appEvento = createApp({
             formEvento: {
                 nombreEvento: '',
                 editarEvento: '',
-
+                editarFechaInicio: '',
+                editarHora: '',
+                editarUbicacion: '',
+                editarModalidad: '',
+                
             },
         }
     },
     mounted() {
+        this.inicializarDatePicker('#fecha_evento_editar', false);
         
         this.tablaLista = $('#listaDeEventos').DataTable({
             "language": spanish,
@@ -81,25 +86,33 @@ const appEvento = createApp({
         });
 
         const self = this;
+
         $('#listaDeEventos tbody').on('click', '.editar-evento', function(e) {
             e.preventDefault();
-            
+
             const tr = $(this).closest('tr');
             const table = $('#listaDeEventos').DataTable();
-            
-            // rowData obtendrá los datos del objeto original (nombre, descripción, etc.)
+
             const rowData = table.row(tr).data();
 
             if(rowData) {
-                // Asignación a Vue (asegúrate que 'self' esté definido arriba como 'const self = this')
+
                 self.formEvento.editarEvento = rowData.nombre_evento;
+                self.formEvento.editarUbicacion = rowData.ubicacion_url;
+                self.formEvento.editarModalidad = rowData.modalidad_evento.toLowerCase();
+                self.formEvento.editarFechaEvento = rowData.fecha_evento;
+                self.formEvento.editarHoraEvento = rowData.hora_evento;
+
+                self.$nextTick(() => {
+                    $('#modalidad_evento_editar')
+                        .val(self.formEvento.editarModalidad)
+                        .trigger('change');
+                });
 
                 $('#id_evento_actualizar').val(rowData.id_evento);
-                
-                // Abrir el modal
+
                 $('#modal_editar_evento').modal('show');
             }
-            
         });
 
         axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -186,22 +199,16 @@ const appEvento = createApp({
         registrarEvento() {
 
         activarLoadBtn('btn_registrar_evento');
-
         let form = $('#formulario_registrar_evento').serialize();
-
         axios.post('/registrar-evento', form)
-
             .then(() => {
-
                 Swal.fire({
                     title: '¡Éxito!',
                     text: 'El evento fue creado correctamente',
                     icon: 'success',
                     confirmButtonText: 'Aceptar'
                 });
-
                 $('#modal_registrar_evento').modal('hide');
-
                 $('#formulario_registrar_evento')[0].reset();
 
                 if (this.tablaLista) {
@@ -212,16 +219,12 @@ const appEvento = createApp({
 
             .catch(error => {
 
-                console.log(error);
-
                 if (error.response?.status === 422) {
-
                     Swal.fire({
                         title: 'Hace falta información',
                         text: 'Por favor completa todos los campos requeridos',
                         icon: 'error'
                     });
-
                     return;
                 }
 
@@ -230,19 +233,19 @@ const appEvento = createApp({
                     text: 'Ocurrió un error, contacta soporte',
                     icon: 'error'
                 });
-
             })
-
             .finally(() => {
-
                 desactivarLoadBtn('btn_registrar_evento');
-
             });
 
         }, 
         editarEvento(){
             const id_evento = $('#id_evento_actualizar').val(); 
             const nombre_evento = $('#nombre_evento_editar').val(); 
+            const ubicacion_url = $('#ubicacion_evento_editar').val();
+            const modalidad_evento = $('#modalidad_evento_editar').val();
+            const fecha_evento = $('#fecha_evento_editar').val();
+            const hora_evento = $('#hora_evento_editar').val();
 
             if (!nombre_evento) {
                 Swal.fire('Error', 'El nombre del evento es obligatorio.', 'error');
@@ -251,7 +254,10 @@ const appEvento = createApp({
 
             axios.post(`/actualizar-evento/${id_evento}`, {
                 nombre_evento: nombre_evento,
-                
+                ubicacion_url: ubicacion_url,
+                modalidad_evento: modalidad_evento,
+                fecha_evento: fecha_evento,
+                hora_evento:hora_evento
             })
             .then(response => {
                 
@@ -265,7 +271,102 @@ const appEvento = createApp({
                 const errorMessage = error.response.data.message || 'Hubo un problema al actualizar el evento.';
                 Swal.fire('Error', errorMessage, 'error');
             });
-        }
+        },
+        inicializarDatePicker( elemento, minDateToday = false) {
+
+            if( minDateToday ) {
+
+                const nowDate = new Date();
+                let today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 0, 0, 0, 0);
+                let maxLimitDate = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate()+60, 0, 0, 0, 0)
+
+                $( elemento ).daterangepicker({
+                    singleDatePicker: true,
+                    // showDropdowns: true,
+                    minYear: 1901,
+                    maxYear: parseInt(moment().format("YYYY"),12),
+                    minDate: today,
+                    maxDate: maxLimitDate,
+                    locale: {
+                        format: "YYYY/MM/DD",
+                        "separator": " - ",
+                        "applyLabel": "Seleccionar fecha",
+                        "cancelLabel": "Cerrar",
+                        "fromLabel": "Desde",
+                        "toLabel": "Hasta",
+                        "customRangeLabel": "Personalizar",
+                        "daysOfWeek": [
+                            "Do",
+                            "Lu",
+                            "Ma",
+                            "Mi",
+                            "Ju",
+                            "Vi",
+                            "Sa"
+                        ],
+                        "monthNames": [
+                            "Enero",
+                            "Febrero",
+                            "Marzo",
+                            "Abril",
+                            "Mayo",
+                            "Junio",
+                            "Julio",
+                            "Agosto",
+                            "Septiembre",
+                            "Octubre",
+                            "Noviembre",
+                            "Diciembre"
+                        ],
+                        "firstDay": 1
+                    }
+                });
+
+                return;
+            }
+
+
+            $( elemento ).daterangepicker({
+                singleDatePicker: true,
+                // showDropdowns: true,
+                minYear: 1901,
+                maxYear: parseInt(moment().format("YYYY"),12),
+                locale: {
+                    format: "YYYY/MM/DD",
+                    "separator": " - ",
+                    "applyLabel": "Seleccionar fecha",
+                    "cancelLabel": "Cerrar",
+                    "fromLabel": "Desde",
+                    "toLabel": "Hasta",
+                    "customRangeLabel": "Personalizar",
+                    "daysOfWeek": [
+                        "Do",
+                        "Lu",
+                        "Ma",
+                        "Mi",
+                        "Ju",
+                        "Vi",
+                        "Sa"
+                    ],
+                    "monthNames": [
+                        "Enero",
+                        "Febrero",
+                        "Marzo",
+                        "Abril",
+                        "Mayo",
+                        "Junio",
+                        "Julio",
+                        "Agosto",
+                        "Septiembre",
+                        "Octubre",
+                        "Noviembre",
+                        "Diciembre"
+                    ],
+                    "firstDay": 1
+                }
+            });
+
+            },
     }
 });
 appEvento.mount('#app_general');

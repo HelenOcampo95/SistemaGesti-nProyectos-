@@ -40,6 +40,61 @@ const appProyectos = createApp({
     
 
     mounted() {
+        this.inicializarDatePicker('#fecha_inicio', false);
+        this.inicializarDatePicker('#fecha_entrega', false);
+
+        $('#id_categoria_editar').on('select2:open', function () {
+
+            let searchField = document.querySelector('.select2-search__field');
+
+            if (searchField) {
+                searchField.dispatchEvent(new Event('input', {
+                    bubbles: true
+                }));
+            }
+
+        });
+
+        $('#id_categoria_editar').select2({
+            dropdownParent: $('#modal_editar_proyecto'),
+            ajax: {
+                url: '/categoria/select-categoria',
+                dataType: 'json',
+                type: 'get',
+                delay: 300,
+
+                data: params => {
+                    return {
+                        busqueda: params.term || '',
+                        page: params.page
+                    }
+                },
+
+                processResults: data => {
+
+                    let results = [];
+
+                    $.each(data, function(index, item) {
+
+                        results.push({
+                            id: item.id_categoria,
+                            text: item.nombre_categoria
+                        });
+
+                    });
+
+                    return {
+                        results: results
+                    }
+                },
+
+                cache: true
+            },
+
+            placeholder: 'Seleccione una categoría',
+            minimumInputLength: 0
+        });
+
         $('#id_docente_director').select2({
             dropdownParent: $('#modal_reasignar_docente'),
             ajax: {
@@ -121,6 +176,103 @@ const appProyectos = createApp({
         }
     },
     methods: {
+        inicializarDatePicker( elemento, minDateToday = false) {
+
+            if( minDateToday ) {
+
+                const nowDate = new Date();
+                let today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 0, 0, 0, 0);
+                let maxLimitDate = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate()+60, 0, 0, 0, 0)
+
+                $( elemento ).daterangepicker({
+                    singleDatePicker: true,
+                    // showDropdowns: true,
+                    // autoUpdateInput: false,
+                    minYear: 1901,
+                    maxYear: parseInt(moment().format("YYYY"),12),
+                    minDate: today,
+                    maxDate: maxLimitDate,
+                    locale: {
+                        format: "YYYY/MM/DD",
+                        "separator": " - ",
+                        "applyLabel": "Seleccionar fecha",
+                        "cancelLabel": "Cerrar",
+                        "fromLabel": "Desde",
+                        "toLabel": "Hasta",
+                        "customRangeLabel": "Personalizar",
+                        "daysOfWeek": [
+                            "Do",
+                            "Lu",
+                            "Ma",
+                            "Mi",
+                            "Ju",
+                            "Vi",
+                            "Sa"
+                        ],
+                        "monthNames": [
+                            "Enero",
+                            "Febrero",
+                            "Marzo",
+                            "Abril",
+                            "Mayo",
+                            "Junio",
+                            "Julio",
+                            "Agosto",
+                            "Septiembre",
+                            "Octubre",
+                            "Noviembre",
+                            "Diciembre"
+                        ],
+                        "firstDay": 1
+                    }
+                });
+
+                return;
+            }
+
+
+            $( elemento ).daterangepicker({
+                singleDatePicker: true,
+                // showDropdowns: true,
+                // autoUpdateInput: false,
+                minYear: 1901,
+                maxYear: parseInt(moment().format("YYYY"),12),
+                locale: {
+                    format: "YYYY/MM/DD",
+                    "separator": " - ",
+                    "applyLabel": "Seleccionar fecha",
+                    "cancelLabel": "Cerrar",
+                    "fromLabel": "Desde",
+                    "toLabel": "Hasta",
+                    "customRangeLabel": "Personalizar",
+                    "daysOfWeek": [
+                        "Do",
+                        "Lu",
+                        "Ma",
+                        "Mi",
+                        "Ju",
+                        "Vi",
+                        "Sa"
+                    ],
+                    "monthNames": [
+                        "Enero",
+                        "Febrero",
+                        "Marzo",
+                        "Abril",
+                        "Mayo",
+                        "Junio",
+                        "Julio",
+                        "Agosto",
+                        "Septiembre",
+                        "Octubre",
+                        "Noviembre",
+                        "Diciembre"
+                    ],
+                    "firstDay": 1
+                }
+            });
+
+        },
         prepararEdicion(proyecto){
             if (!proyecto) {
                 console.error("No se recibió información del proyecto");
@@ -134,6 +286,21 @@ const appProyectos = createApp({
             this.formProyecto.estado_proyecto       = proyecto.estado_proyecto;
             this.formProyecto.id_categoria          = proyecto.id_categoria;
             this.formProyecto.nombre_categoria      = proyecto.categoria.nombre_categoria;
+
+            let option = new Option(
+                proyecto.categoria.nombre_categoria,
+                proyecto.id_categoria,
+                true,
+                true
+            );
+
+            $('#id_categoria_editar')
+                .append(option)
+                .trigger('change');
+
+            $('#estado_proyecto')
+                .val(proyecto.estado_proyecto)
+                .trigger('change');
         },
         actualizarProyecto() {
         let id_proyecto = document.getElementById('id_proyecto').value;
@@ -145,7 +312,7 @@ const appProyectos = createApp({
                 .then(res => {
                     Swal.fire({
                         title: '¡Éxito!',
-                        text: 'La categoria fue actualizada correctamente',
+                        text: 'El proyecto fue actualizado correctamente',
                         icon: 'success',
                         confirmButtonText: 'Aceptar'
                     }).then(() => {

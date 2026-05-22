@@ -261,9 +261,19 @@
                                     <div class="menu-item">
                                         <a class="menu-link" href="{{('eventos')}}">
                                             <span class="menu-icon">
-                                                <i class="bi bi-people-fill fs-3"></i>
+                                                <i class="bi bi-calendar-event"></i>
                                             </span>
                                             <span class="menu-title">Eventos</span>
+                                        </a>
+                                    </div>  
+                                @endrole
+                                @role(['Administrador'])
+                                    <div class="menu-item">
+                                        <a class="menu-link" href="#">
+                                            <span class="menu-icon">
+                                                <i class="bi bi-people-fill fs-3"></i>
+                                            </span>
+                                            <span class="menu-title">Usuarios</span>
                                         </a>
                                     </div>  
                                 @endrole

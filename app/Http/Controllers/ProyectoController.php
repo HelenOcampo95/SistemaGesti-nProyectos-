@@ -191,6 +191,10 @@ class ProyectoController extends Controller
             $proyecto                       = Proyecto::where('id_proyecto', $request->id_proyecto)->firstOrFail();
             $proyecto->nombre_proyecto      = $request->nombre_proyecto; 
             $proyecto->descripcion_proyecto = $request->descripcion_proyecto;
+            if($request->filled('estado_proyecto')){
+                $proyecto->estado_proyecto = $request->estado_proyecto;
+            }
+
             $proyecto->save();
 
             return response()->json('Proyecto actualizado correctamente', 200);
@@ -221,26 +225,51 @@ class ProyectoController extends Controller
     //Listar proyectos para los roles de Docente director y docente lider.
     public function listarProyecto(Request $request){
 
-        $id_docente = auth()->id();
+        $user = auth()->user();
 
-        $proyectos = Proyecto::where('id_docente_director', $id_docente)->Orwhere('id_docente_lider', $id_docente)->with(['categoria']);
-        
-        return DataTables::eloquent($proyectos)
-            ->addColumn('nombre_proyecto', fn($c) => $c->nombre_proyecto ?? 'Sin proyecto')
-            ->addColumn('estado_proyecto', fn($c) => $c->estado_proyecto ?? 'Sin estado')
-            ->addColumn('fecha_inicio', fn($c) => $c->fecha_inicio?? 'Sin fechas')
-            ->addColumn('nombre_categoria', fn($c) => $c->categoria->nombre_categoria?? 'Sin categoria')
-            ->filter(function ($query) use ($request) {
-                $buscar = $request->input('buscar');
-                if (!empty($buscar)) {
-                    $query->whereHas('categoria', function($q) use ($buscar) {
-                        $q->where('nombre_categoria', 'like', "%{$buscar}%");
+        if ($user->hasRole('Administrador')) {
+
+        $proyectos = Proyecto::with(['categoria']);
+
+    } else {
+
+        $id_docente = $user->id;
+
+        $proyectos = Proyecto::where(function ($query) use ($id_docente) {
+
+                $query->where('id_docente_director', $id_docente)
+                    ->orWhere('id_docente_lider', $id_docente);
+
+            })
+            ->with(['categoria']);
+    }
+
+    return DataTables::eloquent($proyectos)
+
+        ->addColumn('nombre_proyecto', fn($c) => $c->nombre_proyecto ?? 'Sin proyecto')
+        ->addColumn('estado_proyecto', fn($c) => $c->estado_proyecto ?? 'Sin estado')
+        ->addColumn('fecha_inicio', fn($c) => $c->fecha_inicio ?? 'Sin fechas')
+        ->addColumn('nombre_categoria', fn($c) => $c->categoria->nombre_categoria ?? 'Sin categoría')
+
+        ->filter(function ($query) use ($request) {
+
+            $buscar = $request->input('buscar');
+
+            if (!empty($buscar)) {
+
+                $query->where(function ($q) use ($buscar) {
+
+                    $q->whereHas('categoria', function ($sub) use ($buscar) {
+                        $sub->where('nombre_categoria', 'like', "%{$buscar}%");
                     })
                     ->orWhere('nombre_proyecto', 'like', "%{$buscar}%")
                     ->orWhere('estado_proyecto', 'like', "%{$buscar}%");
-                }
-            })
-            ->toJson();
+
+                });
+            }
+        })
+
+        ->toJson();
     }
 
     // Cambia esto: public function vincularEstudiante(Request $request, $id_proyecto)

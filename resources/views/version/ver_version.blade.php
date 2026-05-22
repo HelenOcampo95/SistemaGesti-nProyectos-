@@ -34,7 +34,7 @@
                                 <h3 class="fw-bold text-dark fs-1">{{ $version->proyecto->nombre_proyecto }}</h3>
                             </div>
                             <div class="card-toolbar">
-                                <span class="badge badge-{{ $version->estado_version == 'Pendiente' ? 'warning' : 'success' }} px-4 py-3">
+                                <span class="badge badge-{{ $version->estado_version == 'Pendiente' ? 'warning' : ($version->estado_version == 'Aceptada' ? 'success' : 'danger') }} px-4 py-3">
                                     {{ $version->estado_version }}
                                 </span>
                             </div>
@@ -92,7 +92,7 @@
                             </div>
                             @if($version->esPendiente())
                                 <div class="d-flex justify-content-end mt-10">
-                                    <button type="button" id="btn_rechazar_version" class="btn btn-danger me-3" >Rechazar Entrega</button>
+                                    <button type="button" id="btn_rechazar_version" class="btn btn-danger me-3" @click="rechazarVersion({{ $version->id_version}})">Rechazar Entrega</button>
                                     <button type="button" id="btn_aceptar_version" class="btn btn-success" @click="aceptarVersion({{ $version->id_version }})">Aprobar Entrega</button>
                                 </div>
                             @endIf

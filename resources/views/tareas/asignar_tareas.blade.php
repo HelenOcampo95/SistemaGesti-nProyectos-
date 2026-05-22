@@ -203,7 +203,7 @@
     <div class="modal-dialog modal-dialog-centered mw-650px">
         <div class="modal-content" id="id_tarea_editar">
             <form class="form" id="formulario_editar_tarea">
-                <input type="hidden" id="id_tarea_editar" name="id_tarea">
+                <input type="hidden" id="id_tarea_editar_hidden" name="id_tarea">
 
                 <div class="modal-header" id="header_editar_tarea">
                     <h2 class="fw-bold">Editar actividad</h2>

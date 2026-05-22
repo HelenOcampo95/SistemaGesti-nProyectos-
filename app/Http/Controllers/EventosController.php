@@ -80,6 +80,10 @@ class EventosController extends Controller
         try{
             $evento                          = Eventos::findOrFail($id_evento);
             $evento->nombre_evento           = $request->nombre_evento; 
+            $evento->fecha_evento            = $request->fecha_evento;
+            $evento->hora_evento             = $request->hora_evento;
+            $evento->modalidad_evento        = $request->modalidad_evento;
+            $evento->ubicacion_url           = $request->ubicacion_url;
             $evento->save();
 
             return response()->json('Evento actualizado correctamente', 200);
