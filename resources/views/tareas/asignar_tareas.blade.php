@@ -89,7 +89,7 @@
 			<form class="form" id="formulario_asignar_tarea">
 				<!-- Encabezado modal materias primas -->
 					<div class="modal-header" id="kt_modal_add_customer_header">
-						<h2 class="fw-bold">Crear Tarea</h2>
+						<h2 class="fw-bold">Crear Actividad</h2>
 						<div id="kt_modal_add_customer_close" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal" aria-label="Close">
 							<span class="svg-icon svg-icon-1">
 								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -106,7 +106,7 @@
 								<select  class="form-select form-select-solid" data-placeholder="Seleccione un proyecto" name="id_proyecto" id="id_proyecto" required></select>
                             </div>
 							<div class="mb-5 fv-row">
-								<label class="form-label required">Título de la tarea</label>
+								<label class="form-label required">Título de la actividad</label>
 								<input class="form-control form-control-solid form-control-sm" 
 									placeholder="" 
 									name="titulo_tarea" 
@@ -123,7 +123,7 @@
 								</div>
 							</div>
 							<div class="mb-5 fv-row">
-								<label class="form-label required">Descripción de la tarea</label>
+								<label class="form-label required">Descripción de la actividad</label>
 								<textarea 
 									class="form-control form-control-solid form-control-sm"
 									name="descripcion_tarea"
@@ -188,7 +188,7 @@
 					</div>
 					<div class="modal-footer flex-center">
 						<button type="button" id="btn_asignar_tarea" class="btn btn-success" @click.prevent="asignarTarea">
-							<span class="indicator-label">Registrar tarea</span>
+							<span class="indicator-label">Registrar actividad</span>
 							<span class="indicator-progress">Por favor espere...
 							<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
 						</button>

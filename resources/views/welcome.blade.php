@@ -235,7 +235,7 @@
                                         </a>
                                 </div>
                                 @endrole
-                                @role(['Docente Lider', 'Administrador'])
+                                @role(['Administrador'])
                                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
                                         <div class="menu-item">
                                         <a class="menu-link" href="{{ route('categorias') }}">
@@ -269,7 +269,7 @@
                                 @endrole
                                 @role(['Administrador'])
                                     <div class="menu-item">
-                                        <a class="menu-link" href="#">
+                                        <a class="menu-link" href="{{('usuarios')}}">
                                             <span class="menu-icon">
                                                 <i class="bi bi-people-fill fs-3"></i>
                                             </span>

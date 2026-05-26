@@ -120,6 +120,9 @@ Route::get('/seleccionar-categoria', [EventosController::class, 'verCategorias']
 Route::get('/listar-evento', [EventosController::class, 'listaEventos']);
 Route::post('/actualizar-evento/{id_evento}', [EventosController::class, 'actualizarEvento'] );
 Route::post('/eliminar-evento/{id_evento}', [EventosController::class, 'eliminarEvento']);
+
+Route::get('/usuarios', [UsuariosController::class, 'verUsuarios'])->name('usuarios');
+Route::get('/listar-usuarios', [UsuariosController::class, 'listarUsuarios']);
 });
 
 /** Logout (POST, protegido) */

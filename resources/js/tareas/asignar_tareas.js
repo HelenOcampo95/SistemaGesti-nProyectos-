@@ -303,7 +303,7 @@ const appCategorias = createApp({
                     .then(() => {
                         Swal.fire({
                             title: '¡Éxito!',
-                            text: 'La categoria fue creada correctamente',
+                            text: 'La actividad fue creada correctamente',
                             icon: 'success',
                             confirmButtonText: 'Aceptar'
                         });

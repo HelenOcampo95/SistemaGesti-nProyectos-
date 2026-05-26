@@ -50,7 +50,22 @@ const appEvento = createApp({
                 { data: "hora_evento", name: "hora_evento"},
                 { data: "modalidad_evento", name: "modalidad_evento"},
                 { data: "ubicacion_url", name: "ubicacion_url"},
-                { data: "actualizado_en", name: "actualizado_en"},
+                { 
+                    data: "actualizado_en", 
+                    name: "actualizado_en",
+                    render: function(data, type, row) {
+                        if (!data) return '';
+                        const date = new Date(data);
+                        // Formats to DD/MM/YYYY (adjust locale 'es-ES' or 'en-US' as needed)
+                        return date.toLocaleDateString('es-ES', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
+                },
                 { data: "eliminado_en", name: "eliminado_en"},
                 { data: "id_evento", name:"id_evento", sClass:"text-center botones",
                 render: function( data, type, row) {

@@ -210,13 +210,23 @@ class ProyectoController extends Controller
     }
 
     public function selectProyecto(Request $request){
-        $proyecto = Proyecto::select('id_proyecto', 'nombre_proyecto')
-            ->where(function($query) use ($request){
-                $query->where('nombre_proyecto', 'like', '%'. $request->busqueda. '%');
-            })
+        
+        $usuario = auth()->user();
+
+        $proyecto = Proyecto::select('id_proyecto', 'nombre_proyecto');
+
+        if (!$usuario->hasRole('Administrador')) {
+            $proyecto->where(function ($query) use ($usuario) {
+                $query->where('id_docente_director', $usuario->id_usuario)
+                    ->orWhere('id_docente_lider', $usuario->id_usuario);
+            });
+        }
+
+        $proyecto = $proyecto->where('nombre_proyecto', 'like', '%' . $request->busqueda . '%')
             ->limit(50)
             ->get();
-            return response()->json($proyecto, 200);
+
+        return response()->json($proyecto, 200);
     }
 
     public function verListadoProyecto(){

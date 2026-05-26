@@ -33,7 +33,22 @@ const appCategorias = createApp({
                 "columns": [
                     {data: "nombre_proyecto", name: "nombre_proyecto" },
                     {data: "estado_proyecto", name: "estado_proyecto" },
-                    {data: "fecha_inicio", name: "fecha_inicio" },
+                    { 
+                    data: "fecha_inicio", 
+                    name: "fecha_inicio",
+                    render: function(data, type, row) {
+                        if (!data) return '';
+                        const date = new Date(data);
+                        // Formats to DD/MM/YYYY (adjust locale 'es-ES' or 'en-US' as needed)
+                        return date.toLocaleDateString('es-ES', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
+                },
                     {data: "nombre_categoria", name: "nombre_categoria" },
                     { data: "id_proyecto", name:"id_proyecto", sClass:"text-center botones",
                         render: function( data, type, row) {

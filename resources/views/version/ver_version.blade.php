@@ -12,7 +12,7 @@
 									<path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
 								</svg>
 							</a>
-							<h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">Detalle</h1>
+							<h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">Detalle Versión</h1>
 						</div>
 							<ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
 								<li class="breadcrumb-item text-muted">
@@ -90,12 +90,14 @@
                                     </div>
                                 </div>
                             </div>
+                            @can('btn_version')
                             @if($version->esPendiente())
                                 <div class="d-flex justify-content-end mt-10">
                                     <button type="button" id="btn_rechazar_version" class="btn btn-danger me-3" @click="rechazarVersion({{ $version->id_version}})">Rechazar Entrega</button>
                                     <button type="button" id="btn_aceptar_version" class="btn btn-success" @click="aceptarVersion({{ $version->id_version }})">Aprobar Entrega</button>
                                 </div>
                             @endIf
+                            @endcan
                         </div>
                     </div>
                 </div>
