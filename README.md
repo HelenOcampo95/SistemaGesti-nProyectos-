@@ -1,6 +1,8 @@
-# Nombre del Proyecto
+# Gestión de semilleros de investigación por medio de un sistema que permita obtener indicadores de desempeño
 
-Breve descripción del proyecto.
+Sistema web desarrollado para la gestión y seguimiento de semilleros de investigación, permitiendo obtener indicadores de desempeño y visualizar información de acuerdo con el rol.
+
+La plataforma facilita la administración de proyectos, usuarios, tareas y reportes académicos, optimizando el control y seguimiento de los procesos investigativos dentro de la institución.
 
 ## Tecnologías utilizadas
 
